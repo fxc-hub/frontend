@@ -1,11 +1,11 @@
-# 🚀 GitHub Actions Quick Setup Guide (Contabo VPS + CyberPanel)
+# 🚀 GitHub Actions Quick Setup Guide (Contabo VPS + CyberPanel - Staging)
 
 ## ✅ What's Already Done
 
-Both repositories now have GitHub Actions workflows configured for Contabo VPS with CyberPanel:
+Both repositories now have GitHub Actions workflows configured for Contabo VPS with CyberPanel staging environment:
 
-- **Frontend**: `.github/workflows/deploy.yml` (Next.js)
-- **Backend**: `.github/workflows/deploy.yml` (Laravel)
+- **Frontend**: `.github/workflows/deploy.yml` (Next.js) → `stage.fxc-hub.com`
+- **Backend**: `.github/workflows/deploy.yml` (Laravel) → `api.fxc-hub.com`
 
 ## 🔐 Required GitHub Secrets
 
@@ -39,6 +39,29 @@ sudo chown -R admin:admin /home/admin/fxchubs/backend
 cd /home/admin/fxchubs/backend
 git clone https://github.com/fxc-hub/backend.git .
 composer install
+```
+
+## 🌐 CyberPanel Website Setup
+
+### Create Websites:
+1. **Frontend (Staging)**: `stage.fxc-hub.com`
+2. **Backend (API)**: `api.fxc-hub.com`
+
+### Environment Configuration:
+
+#### Frontend (.env.local):
+```env
+NEXT_PUBLIC_API_URL=https://api.fxc-hub.com
+NEXT_PUBLIC_SITE_URL=https://stage.fxc-hub.com
+NEXT_PUBLIC_APP_ENV=staging
+```
+
+#### Backend (.env):
+```env
+APP_ENV=staging
+APP_URL=https://api.fxc-hub.com
+DB_DATABASE=fxchubs_staging
+CORS_ALLOWED_ORIGINS=https://stage.fxc-hub.com,https://fxc-hub.com
 ```
 
 ## 🔄 How It Works
@@ -78,6 +101,10 @@ composer install
    - Check CyberPanel logs: `/usr/local/lsws/logs/`
    - Verify website configurations in CyberPanel
 
+5. **CORS Issues**
+   - Check CORS configuration in backend
+   - Verify domain names in CORS_ALLOWED_ORIGINS
+
 ## 📞 Next Steps
 
 1. **Set up GitHub Secrets** (see above)
@@ -98,6 +125,18 @@ composer install
 For detailed setup instructions including CyberPanel configuration, SSL certificates, and Nginx setup, see:
 - **`CONTRABO_VPS_SETUP.md`** - Complete deployment guide
 
+## 🌐 Staging Environment URLs
+
+After setup, your staging environment will be available at:
+- **Frontend**: https://stage.fxc-hub.com
+- **Backend API**: https://api.fxc-hub.com
+
+## 🔄 Future Production Migration
+
+When ready to go live, you can migrate to:
+- **Frontend**: https://fxc-hub.com
+- **Backend**: https://api.fxc-hub.com (same API endpoint)
+
 ---
 
-**🎉 You're all set! Push to main branch to trigger your first automated deployment!**
+**🎉 You're all set! Push to main branch to trigger your first automated deployment to staging!**
