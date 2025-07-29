@@ -3483,7 +3483,7 @@ const EditPlanModal = ({ plan, onClose, onSuccess }: { plan: Plan, onClose: () =
 }
 
 // Helper function to get currency symbol
-export function getCurrencySymbol(currency: string) {
+function getCurrencySymbol(currency: string) {
   switch (currency) {
     case 'USD': return '$';
     case 'USDT': return 'USDT';
