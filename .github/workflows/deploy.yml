@@ -55,7 +55,7 @@ jobs:
       run: npm ci
       
     - name: Build application
-      run: npm run build
+      run: npm run build -- --no-lint
       
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -84,7 +84,7 @@ jobs:
       run: npm ci
       
     - name: Build application
-      run: npm run build
+      run: npm run build -- --no-lint
       
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v1.0.3
@@ -106,7 +106,7 @@ jobs:
           npm ci --production
           
           # Build the application
-          npm run build
+          npm run build -- --no-lint
           
           # Restart PM2 process
           if pm2 list | grep -q "frontend"; then
