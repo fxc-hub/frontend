@@ -22,6 +22,7 @@ import {
 import UserNavigation from '@/components/UserNavigation'
 import CreateAlertModal from '@/components/CreateAlertModal'
 import SignalHistoryModal from '@/components/SignalHistoryModal'
+import SiteLogo from '@/components/SiteLogo'
 
 interface Alert {
   id: string
@@ -280,7 +281,7 @@ export default function AlertsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
-              <h1 className="text-2xl font-bold text-white">FXCHUB</h1>
+              <SiteLogo className="h-8 w-auto" fallbackText="FXCHUB" />
               <UserNavigation 
                 userInfo={userInfo}
                 onLogout={() => {
@@ -292,7 +293,7 @@ export default function AlertsPage() {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
                 <PlusIcon className="w-5 h-5" />
                 <span>Create Alert</span>
@@ -306,7 +307,7 @@ export default function AlertsPage() {
       <div className="bg-gray-900 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center">
-            <BellIcon className="w-8 h-8 text-blue-400 mr-3" />
+                            <BellIcon className="w-8 h-8 text-yellow-400 mr-3" />
             <h1 className="text-3xl font-bold text-white">Signal Alerts</h1>
           </div>
         </div>
@@ -321,10 +322,10 @@ export default function AlertsPage() {
         )}
 
         {/* Tutorial Accordion */}
-        <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl mb-8">
+        <div className="bg-gradient-to-r from-yellow-900/20 to-purple-900/20 border border-yellow-500/30 rounded-xl mb-8">
           <div className="p-6">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="bg-blue-600 p-3 rounded-lg">
+              <div className="bg-yellow-600 p-3 rounded-lg">
                 <BellIcon className="w-6 h-6 text-white" />
               </div>
               <h2 className="text-xl font-bold text-white">Signal Alerts Tutorial</h2>
@@ -338,7 +339,7 @@ export default function AlertsPage() {
                   onClick={() => setTutorialOpen(prev => ({ ...prev, what: !prev.what }))}
                   className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-700/50 transition-colors rounded-lg"
                 >
-                  <span className="font-semibold text-blue-400">What are Signal Alerts?</span>
+                  <span className="font-semibold text-yellow-400">What are Signal Alerts?</span>
                   <ChevronDownIcon className={`w-5 h-5 text-gray-400 transition-transform ${tutorialOpen.what ? 'rotate-180' : ''}`} />
                 </button>
                 {tutorialOpen.what && (
@@ -352,19 +353,19 @@ export default function AlertsPage() {
                         <h4 className="font-medium text-white mb-2">Key Features:</h4>
                         <ul className="text-gray-300 space-y-2 text-sm">
                           <li className="flex items-start space-x-2">
-                            <span className="text-blue-400 mt-1">•</span>
+                            <span className="text-yellow-400 mt-1">•</span>
                             <span><strong>Multi-channel notifications:</strong> Email, SMS, Telegram, and Web Push</span>
                           </li>
                           <li className="flex items-start space-x-2">
-                            <span className="text-blue-400 mt-1">•</span>
+                            <span className="text-yellow-400 mt-1">•</span>
                             <span><strong>Real-time monitoring:</strong> 24/7 market surveillance across multiple exchanges</span>
                           </li>
                           <li className="flex items-start space-x-2">
-                            <span className="text-blue-400 mt-1">•</span>
+                            <span className="text-yellow-400 mt-1">•</span>
                             <span><strong>Customizable conditions:</strong> Set price levels, technical indicators, and market events</span>
                           </li>
                           <li className="flex items-start space-x-2">
-                            <span className="text-blue-400 mt-1">•</span>
+                            <span className="text-yellow-400 mt-1">•</span>
                             <span><strong>Recurring alerts:</strong> Alerts that reset and trigger multiple times</span>
                           </li>
                         </ul>
@@ -401,7 +402,7 @@ export default function AlertsPage() {
                   onClick={() => setTutorialOpen(prev => ({ ...prev, howToUse: !prev.howToUse }))}
                   className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-700/50 transition-colors rounded-lg"
                 >
-                  <span className="font-semibold text-blue-400">How to Use Signal Alerts</span>
+                  <span className="font-semibold text-yellow-400">How to Use Signal Alerts</span>
                   <ChevronDownIcon className={`w-5 h-5 text-gray-400 transition-transform ${tutorialOpen.howToUse ? 'rotate-180' : ''}`} />
                 </button>
                 {tutorialOpen.howToUse && (
@@ -409,21 +410,21 @@ export default function AlertsPage() {
                     <div className="space-y-4">
                       <div className="bg-gray-700/50 rounded-lg p-4">
                         <h4 className="font-medium text-white mb-2 flex items-center">
-                          <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">1</span>
+                          <span className="bg-yellow-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">1</span>
                           Create an Alert
                         </h4>
                         <p className="text-sm text-gray-300">Click the "Create Alert" button in the top-right corner to set up a new signal notification. You'll be guided through a step-by-step process to configure your alert.</p>
                       </div>
                       <div className="bg-gray-700/50 rounded-lg p-4">
                         <h4 className="font-medium text-white mb-2 flex items-center">
-                          <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">2</span>
+                          <span className="bg-yellow-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">2</span>
                           Configure Conditions
                         </h4>
                         <p className="text-sm text-gray-300">Choose your currency pair, set trigger conditions (price levels, technical indicators), select notification methods, and configure alert timing and recurrence settings.</p>
                       </div>
                       <div className="bg-gray-700/50 rounded-lg p-4">
                         <h4 className="font-medium text-white mb-2 flex items-center">
-                          <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">3</span>
+                          <span className="bg-yellow-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">3</span>
                           Monitor & Manage
                         </h4>
                         <p className="text-sm text-gray-300">Track your alert status in the table below, view signal history, export data for analysis, and manage your alerts (pause, edit, or delete as needed).</p>
@@ -451,9 +452,9 @@ export default function AlertsPage() {
                           Use multiple notification channels (Email + SMS + Telegram) to ensure you never miss important signals, especially during high-impact market events.
                         </p>
                       </div>
-                      <div className="bg-blue-600/10 border border-blue-500/30 rounded-lg p-4">
-                        <h4 className="font-medium text-blue-400 mb-2">Combine Alert Types</h4>
-                        <p className="text-sm text-blue-300">
+                      <div className="bg-yellow-600/10 border border-yellow-500/30 rounded-lg p-4">
+                        <h4 className="font-medium text-yellow-400 mb-2">Combine Alert Types</h4>
+                        <p className="text-sm text-yellow-300">
                           Combine price alerts with technical indicator conditions for more sophisticated trading strategies. For example, set a price alert that only triggers when RSI is oversold.
                         </p>
                       </div>
@@ -481,7 +482,7 @@ export default function AlertsPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <div className="bg-gray-900 rounded-xl p-6">
             <div className="flex items-center">
-              <div className="bg-blue-600 p-3 rounded-lg mr-4">
+              <div className="bg-yellow-600 p-3 rounded-lg mr-4">
                 <BellIcon className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -552,7 +553,7 @@ export default function AlertsPage() {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   placeholder="Search alerts..."
                 />
               </div>
@@ -629,7 +630,7 @@ export default function AlertsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="bg-blue-600 p-2 rounded-lg mr-3">
+                        <div className="bg-yellow-600 p-2 rounded-lg mr-3">
                           <span className="text-white text-xs font-bold">{alert.symbol}</span>
                         </div>
                         <div className="text-sm text-gray-400">{alert.exchange}</div>
@@ -638,7 +639,7 @@ export default function AlertsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-white">{getConditionDisplay(alert.conditionType, alert.conditionValue)}</div>
                       {alert.isRecurring && (
-                        <div className="text-xs text-blue-400">Recurring</div>
+                        <div className="text-xs text-yellow-400">Recurring</div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -657,7 +658,7 @@ export default function AlertsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex space-x-1">
-                        {alert.notifyEmail && <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">📧</span>}
+                        {alert.notifyEmail && <span className="text-xs bg-yellow-600 text-white px-2 py-1 rounded">📧</span>}
                         {alert.notifySms && <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">📱</span>}
                         {alert.notifyTelegram && <span className="text-xs bg-cyan-600 text-white px-2 py-1 rounded">💬</span>}
                         {alert.notifyWebPush && <span className="text-xs bg-purple-600 text-white px-2 py-1 rounded">🔔</span>}
@@ -682,7 +683,7 @@ export default function AlertsPage() {
                         </button>
                         <button
                           onClick={() => setSelectedAlert(alert)}
-                          className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                          className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
                           title="Edit Alert"
                         >
                           <PencilIcon className="w-4 h-4" />
@@ -714,7 +715,7 @@ export default function AlertsPage() {
               {!searchTerm && filterStatus === 'all' && (
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   Create Your First Alert
                 </button>

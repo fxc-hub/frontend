@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'; // Add this import
+import SiteLogo from '@/components/SiteLogo'
 
 export default function LoginPage() {
   const [login, setLogin] = useState('ateyjohn@gmail.com')
@@ -14,6 +15,29 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const router = useRouter()
   const { login: loginUser } = useAuth(); // Use AuthContext
+  const [homepageImages, setHomepageImages] = useState([
+    '/images/rsz_1751870612148.jpg',
+    '/images/rsz_holiday.jpg',
+    '/images/rsz_1beach.jpg',
+    '/images/rsz_1751870993363.jpg',
+  ]);
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch('/api/admin/site-settings');
+        if (!res.ok) return;
+        const settings = await res.json();
+        const images = [1,2,3,4].map(i => {
+          const found = settings.find((s:any) => s.key === `homepage_image_${i}`);
+          return found && found.value ? found.value : homepageImages[i-1];
+        });
+        setHomepageImages(images);
+      } catch {}
+    }
+    fetchSettings();
+    // eslint-disable-next-line
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,27 +97,24 @@ export default function LoginPage() {
       {/* Left side - Images Grid */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <div className="grid grid-cols-2 gap-4 p-8 w-full">
-          {/* Top Left - Social Media/Apps */}
+          {/* Top Left */}
           <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-orange-500 to-yellow-600 p-6 flex items-center justify-center"
-            style={{ backgroundImage: "url('/images/rsz_1751870612148.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            style={{ backgroundImage: `url('${homepageImages[0]}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <div className="absolute inset-0 bg-black/40"></div>
           </div>
-
-          {/* Top Right - Payment/Cards */}
+          {/* Top Right */}
           <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 p-6 flex items-center justify-center"
-            style={{ backgroundImage: "url('/images/rsz_holiday.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            style={{ backgroundImage: `url('${homepageImages[1]}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <div className="absolute inset-0 bg-black/40"></div>
           </div>
-
-          {/* Bottom Left - Community */}
+          {/* Bottom Left */}
           <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-green-600 to-blue-600 p-6 flex items-center justify-center"
-            style={{ backgroundImage: "url('/images/rsz_1beach.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            style={{ backgroundImage: `url('${homepageImages[2]}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <div className="absolute inset-0 bg-black/40"></div>
           </div>
-
-          {/* Bottom Right - Trading/Finance */}
+          {/* Bottom Right */}
           <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-600 to-teal-600 p-6 flex items-center justify-center"
-            style={{ backgroundImage: "url('/images/rsz_1751870993363.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            style={{ backgroundImage: `url('${homepageImages[3]}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <div className="absolute inset-0 bg-black/40"></div>
           </div>
         </div>
@@ -105,13 +126,13 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center">
             <div className="flex flex-col items-center justify-center mb-8">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-full w-28 h-28 flex items-center justify-center mb-4">
-                <span className="text-5xl font-bold text-white">FX</span>
+              <div className="w-28 h-28 flex items-center justify-center mb-4">
+                <SiteLogo className="w-28 h-28" fallbackText="FX" />
               </div>
             </div>
             <h2 className="text-4xl font-bold text-white mb-2">Welcome Back!</h2>
             <p className="text-gray-400 text-lg">
-              Sign in with your email and password to access all that FXCHub has to offer. 
+              Sign in with your email and password to access all that FXC-Hub has to offer. 
               Your journey begins now!
             </p>
           </div>
@@ -138,7 +159,7 @@ export default function LoginPage() {
                     required
                     value={login}
                     onChange={(e) => setLogin(e.target.value)}
-                    className="appearance-none relative block w-full px-3 py-4 pl-10 pr-3 border border-gray-600 placeholder-gray-400 text-white rounded-lg bg-gray-800/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-gray-800/70 transition-all duration-200"
+                    className="appearance-none relative block w-full px-3 py-4 pl-10 pr-3 border border-gray-600 placeholder-gray-400 text-white rounded-lg bg-gray-800/50 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent focus:bg-gray-800/70 transition-all duration-200"
                     placeholder="Email or Phone Number"
                   />
                 </div>
@@ -157,7 +178,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="appearance-none relative block w-full px-3 py-4 pl-10 pr-12 border border-gray-600 placeholder-gray-400 text-white rounded-lg bg-gray-800/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-gray-800/70 transition-all duration-200"
+                    className="appearance-none relative block w-full px-3 py-4 pl-10 pr-12 border border-gray-600 placeholder-gray-400 text-white rounded-lg bg-gray-800/50 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent focus:bg-gray-800/70 transition-all duration-200"
                     placeholder="••••••••"
                   />
                   <button
@@ -180,7 +201,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-lg font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-lg font-medium rounded-lg text-white bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {isLoading ? (
                   <div className="flex items-center">
@@ -203,7 +224,7 @@ export default function LoginPage() {
               </Link>
               <Link
                 href="/auth/register"
-                className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-sm text-yellow-400 hover:text-yellow-300 transition-colors"
               >
                 Create an account
               </Link>

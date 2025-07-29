@@ -295,7 +295,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
         }
       } else if (indicator.type === 'JS_SCRIPT') {
         // Execute JS Script
-        const jsData = await executeJsScript(indicator.jsCode || '', symbol, interval)
+        const jsData = await executeJsScript(indicator.jsCode || '', symbol, interval, indicator.parameters || {})
         if (jsData) {
           indicatorSeries = (chartRef.current as any).addSeries('line', {
             color: '#9C27B0',
@@ -360,8 +360,25 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
   }
 
   // Define executeJsScript before use
-  const executeJsScript = async (jsCode: string, symbol: string, interval: string) => {
+  const executeJsScript = async (jsCode: string, symbol: string, interval: string, parameters: any = {}) => {
     try {
+      // First, get the historical data
+      const dataResponse = await fetch(`/api/forex/historical?symbol=${symbol}&interval=${interval}`)
+      if (!dataResponse.ok) {
+        throw new Error('Failed to fetch market data')
+      }
+      
+      const marketData = await dataResponse.json()
+      const candles = marketData.values.map((item: any) => ({
+        open: parseFloat(item.open),
+        high: parseFloat(item.high),
+        low: parseFloat(item.low),
+        close: parseFloat(item.close),
+        volume: parseFloat(item.volume || 0),
+        timestamp: new Date(item.datetime).getTime()
+      }))
+
+      // Execute the JavaScript indicator
       const response = await fetch(`/api/indicators/js-script`, {
         method: 'POST',
         headers: {
@@ -370,9 +387,12 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
         body: JSON.stringify({
           jsCode,
           symbol,
-          interval
+          interval,
+          candles,
+          parameters
         })
       });
+      
       if (response.ok) {
         const data = await response.json();
         return data.values.map((item: any) => ({

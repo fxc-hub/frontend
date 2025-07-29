@@ -15,6 +15,7 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
+import { api } from '../lib/api'
 
 interface WatchlistPair {
   id: string
@@ -79,44 +80,48 @@ export default function TradingDashboard() {
   const fetchMarketData = useCallback(async (symbols: string[]): Promise<Record<string, PairData>> => {
     try {
       const token = localStorage.getItem('token')
-      if (!token) return {}
-
-      const symbolsParam = symbols.join(',')
-      const response = await fetch(`/api/market-data?symbols=${symbolsParam}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-        const pairDataMap: Record<string, PairData> = {}
-        
-        // Update data source information
-        setDataSource(result.source || 'api')
-        setApiMessage(result.message || 'Live market data')
-        
-        if (result.data) {
-          result.data.forEach((item: any) => {
-            pairDataMap[item.symbol] = {
-              symbol: item.symbol,
-              price: item.price,
-              change: item.change || 0,
-              changePercent: item.changePercent || 0,
-              high: item.price * 1.01, // Approximate high
-              low: item.price * 0.99,  // Approximate low
-              volume: Math.floor(Math.random() * 1000000) // Mock volume
-            }
-          })
-        }
-        
-        return pairDataMap
-      } else {
-        console.error('Failed to fetch market data')
+      if (!token) {
         setDataSource('mock_data')
-        setApiMessage('Using demo data - API request failed')
+        setApiMessage('Using demo data - No authentication token')
         return generateMockPairData(symbols)
       }
+
+      const symbolsParam = symbols.join(',')
+      
+      try {
+        const response = await api(`/forex/dashboard?symbols=${symbolsParam}`, 'GET', undefined, token)
+        
+        if (response.data) {
+          const pairDataMap: Record<string, PairData> = {}
+          
+          // Update data source information
+          setDataSource(response.data.source || 'api')
+          setApiMessage(response.data.message || 'Live market data')
+          
+          if (response.data.data) {
+            response.data.data.forEach((item: any) => {
+              pairDataMap[item.symbol] = {
+                symbol: item.symbol,
+                price: item.price,
+                change: item.change || 0,
+                changePercent: item.changePercent || 0,
+                high: item.price * 1.01, // Approximate high
+                low: item.price * 0.99,  // Approximate low
+                volume: Math.floor(Math.random() * 1000000) // Mock volume
+              }
+            })
+          }
+          
+          return pairDataMap
+        }
+      } catch (apiError) {
+        console.error('Failed to fetch market data from API:', apiError)
+      }
+      
+      // Fallback to mock data
+      setDataSource('mock_data')
+      setApiMessage('Using demo data - API request failed')
+      return generateMockPairData(symbols)
     } catch (error) {
       console.error('Error fetching market data:', error)
       setDataSource('mock_data')
@@ -147,28 +152,39 @@ export default function TradingDashboard() {
   const fetchDashboardData = useCallback(async () => {
     try {
       const token = localStorage.getItem('token')
-      if (!token) return
-
-      const headers = { 'Authorization': `Bearer ${token}` }
-
-      // Fetch watchlists and favorites in parallel
-      const [watchlistsRes, favoritesRes] = await Promise.all([
-        fetch('/api/user/watchlists', { headers }),
-        fetch('/api/user/favorites', { headers })
-      ])
-
-      if (watchlistsRes.ok) {
-        const { watchlists: wlData } = await watchlistsRes.json()
-        setWatchlists(wlData)
-        if (wlData.length > 0 && !activeWatchlist) {
-          const defaultWatchlist = wlData.find((wl: Watchlist) => wl.isDefault) || wlData[0]
-          setActiveWatchlist(defaultWatchlist.id)
-        }
+      if (!token) {
+        // Set mock data if no token
+        setTradingStats({
+          totalTrades: 127,
+          winRate: 64.2,
+          netProfit: 12847.50,
+          profitFactor: 1.68,
+          maxDrawdown: -892.30
+        })
+        setLoading(false)
+        return
       }
 
-      if (favoritesRes.ok) {
-        const { favorites: favData } = await favoritesRes.json()
-        setFavorites(favData)
+      // Try to fetch watchlists and favorites from API
+      try {
+        const [watchlistsRes, favoritesRes] = await Promise.all([
+          api('/user/watchlists', 'GET', undefined, token),
+          api('/user/favorites', 'GET', undefined, token)
+        ])
+
+        if (watchlistsRes.data && watchlistsRes.data.watchlists) {
+          setWatchlists(watchlistsRes.data.watchlists)
+          if (watchlistsRes.data.watchlists.length > 0 && !activeWatchlist) {
+            const defaultWatchlist = watchlistsRes.data.watchlists.find((wl: Watchlist) => wl.isDefault) || watchlistsRes.data.watchlists[0]
+            setActiveWatchlist(defaultWatchlist.id)
+          }
+        }
+
+        if (favoritesRes.data && favoritesRes.data.favorites) {
+          setFavorites(favoritesRes.data.favorites)
+        }
+      } catch (apiError) {
+        console.error('Error fetching dashboard data from API:', apiError)
       }
 
       // Generate mock trading stats
@@ -236,18 +252,10 @@ export default function TradingDashboard() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const response = await fetch('/api/user/favorites', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ symbol, exchange: 'FOREX' })
-      })
+      const response = await api('/user/favorites', 'POST', { symbol, exchange: 'FOREX' }, token)
 
-      if (response.ok) {
-        const { isFavorited } = await response.json()
-        if (isFavorited) {
+      if (response.data && response.data.isFavorited !== undefined) {
+        if (response.data.isFavorited) {
           setFavorites(prev => [...prev, { 
             id: Date.now().toString(), 
             symbol, 
@@ -271,19 +279,12 @@ export default function TradingDashboard() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const response = await fetch(`/api/user/watchlists/${activeWatchlist}/pairs`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          symbol: newPair.symbol.toUpperCase(),
-          exchange: newPair.exchange
-        })
-      })
+      const response = await api(`/user/watchlists/${activeWatchlist}/pairs`, 'POST', {
+        symbol: newPair.symbol.toUpperCase(),
+        exchange: newPair.exchange
+      }, token)
 
-      if (response.ok) {
+      if (response.data) {
         fetchDashboardData()
         setShowAddPairModal(false)
         setNewPair({ symbol: '', exchange: 'FOREX' })
@@ -388,7 +389,7 @@ export default function TradingDashboard() {
           </div>
           <div className="bg-gray-800 rounded-lg p-4">
             <div className="text-gray-400 text-sm">Profit Factor</div>
-            <div className="text-2xl font-bold text-blue-400">{tradingStats.profitFactor}</div>
+                            <div className="text-2xl font-bold text-yellow-400">{tradingStats.profitFactor}</div>
           </div>
           <div className="bg-gray-800 rounded-lg p-4">
             <div className="text-gray-400 text-sm">Max Drawdown</div>
@@ -418,7 +419,7 @@ export default function TradingDashboard() {
               )}
               <button
                 onClick={() => setShowAddPairModal(true)}
-                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors"
+                className="flex items-center space-x-2 bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-lg transition-colors"
               >
                 <PlusIcon className="w-4 h-4" />
                 <span>Add Pair</span>
@@ -472,7 +473,7 @@ export default function TradingDashboard() {
               <p>No pairs in watchlist</p>
               <button
                 onClick={() => setShowAddPairModal(true)}
-                className="mt-4 text-blue-400 hover:text-blue-300"
+                className="mt-4 text-yellow-400 hover:text-yellow-300"
               >
                 Add your first pair
               </button>
@@ -533,7 +534,7 @@ export default function TradingDashboard() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-400">Available Margin</span>
-                <span className="text-blue-400">$12,856.20</span>
+                <span className="text-yellow-400">$12,856.20</span>
               </div>
             </div>
           </div>
@@ -571,7 +572,7 @@ export default function TradingDashboard() {
               <div className="flex items-center space-x-3 pt-4">
                 <button
                   onClick={addPairToWatchlist}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   Add Pair
                 </button>

@@ -166,16 +166,16 @@ export default function AdminSidebar({
             onClick: () => onTabChange?.('plans')
           },
           {
-            id: 'indicators',
-            name: 'Indicators',
-            icon: ChartBarIcon,
-            onClick: () => onTabChange?.('indicators')
-          },
-          {
             id: 'indicator-manager',
             name: 'Indicator Manager',
             icon: PuzzlePieceIcon,
             onClick: () => onTabChange?.('indicator-manager')
+          },
+          {
+            id: 'chart-manager',
+            name: 'Chart Manager',
+            icon: ChartBarSquareIcon,
+            onClick: () => onTabChange?.('chart-manager')
           },
           {
             id: 'settings',

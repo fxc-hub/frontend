@@ -108,7 +108,7 @@ export default function MarketplacePage() {
   const tiers = [
     { value: 'all', label: 'All Tiers' },
     { value: 'FREE', label: 'Free', color: 'text-green-400' },
-    { value: 'PRO', label: 'Pro', color: 'text-blue-400' },
+            { value: 'PRO', label: 'Pro', color: 'text-yellow-400' },
     { value: 'VIP', label: 'VIP', color: 'text-purple-400' }
   ]
 
@@ -215,7 +215,7 @@ export default function MarketplacePage() {
   const getTierBadge = (tier: string) => {
     const config = {
       FREE: { color: 'bg-green-500/10 text-green-400 border-green-500/30', label: 'Free' },
-      PRO: { color: 'bg-blue-500/10 text-blue-400 border-blue-500/30', label: 'Pro' },
+              PRO: { color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30', label: 'Pro' },
       VIP: { color: 'bg-purple-500/10 text-purple-400 border-purple-500/30', label: 'VIP' }
     }
     const { color, label } = config[tier as keyof typeof config] || config.FREE
@@ -264,7 +264,7 @@ export default function MarketplacePage() {
                 <div className="text-sm text-gray-400">Your Plan</div>
                 <div className={`font-medium ${
                   userTier === 'VIP' ? 'text-purple-400' :
-                  userTier === 'PRO' ? 'text-blue-400' : 'text-green-400'
+                  userTier === 'PRO' ? 'text-yellow-400' : 'text-green-400'
                 }`}>
                   {userTier}
                 </div>

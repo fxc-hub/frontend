@@ -37,8 +37,7 @@ export default function PaymentCallbackPage() {
 
       // Verify payment with backend
       const response = await api('/api/payment/verify', 'POST', {
-        reference: reference,
-        gateway: searchParams.get('gateway') || 'flutterwave'
+        reference: reference
       }, token)
 
       if (response.success) {

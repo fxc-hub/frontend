@@ -85,7 +85,7 @@ export default function AdminLayout({
         <div className="flex items-center justify-between h-16">
           {/* Logo and Title */}
           <div className="flex items-center space-x-4">
-            <div className={`w-8 h-8 ${isDark ? 'bg-blue-600' : 'bg-blue-500'} rounded-lg flex items-center justify-center`}>
+                            <div className={`w-8 h-8 ${isDark ? 'bg-yellow-600' : 'bg-yellow-500'} rounded-lg flex items-center justify-center`}>
               <span className="text-white font-bold text-sm">W</span>
             </div>
             <div>
@@ -156,7 +156,7 @@ export default function AdminLayout({
             </button>
             
             <div className="flex items-center space-x-2">
-              <div className={`w-6 h-6 ${isDark ? 'bg-blue-600' : 'bg-blue-500'} rounded flex items-center justify-center`}>
+                              <div className={`w-6 h-6 ${isDark ? 'bg-yellow-600' : 'bg-yellow-500'} rounded flex items-center justify-center`}>
                 <span className="text-white font-bold text-xs">W</span>
               </div>
               <h1 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -215,7 +215,7 @@ export default function AdminLayout({
                   onClick={toggleSidebar}
                   className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
                     settings.sidebarEnabled 
-                      ? 'bg-blue-600' 
+                      ? 'bg-yellow-600' 
                       : isDark ? 'bg-gray-600' : 'bg-gray-200'
                   }`}
                 >
@@ -252,7 +252,7 @@ export default function AdminLayout({
                   onClick={() => updateSetting('compactMode', !settings.compactMode)}
                   className={`relative inline-flex h-6 w-11 rounded-full transition-colors ${
                     settings.compactMode 
-                      ? 'bg-blue-600' 
+                      ? 'bg-yellow-600' 
                       : isDark ? 'bg-gray-600' : 'bg-gray-200'
                   }`}
                 >
@@ -266,7 +266,7 @@ export default function AdminLayout({
             <div className={`p-6 border-t ${isDark ? 'border-gray-600' : 'border-gray-200'}`}>
               <button
                 onClick={() => setShowSettingsModal(false)}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                className="w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors"
               >
                 Done
               </button>

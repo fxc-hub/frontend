@@ -187,11 +187,13 @@ export default function PaymentGatewayManager({ onSuccess }: PaymentGatewayManag
     return isNaN(num) ? defaultValue : num
   }
 
+  // Filter out Stripe and Flutterwave from displayed gateways
   const filteredGateways = isLoading || !Array.isArray(gateways) ? [] : gateways.filter(gateway => {
     const displayName = gateway.displayName || gateway.display_name || '';
     const gatewayType = gateway.gateway || '';
     const searchLower = searchTerm.toLowerCase();
-    
+    // Hide Stripe and Flutterwave from UI
+    if (gatewayType === 'STRIPE' || gatewayType === 'FLUTTERWAVE') return false;
     return displayName.toLowerCase().includes(searchLower) ||
            gatewayType.toLowerCase().includes(searchLower);
   })
@@ -403,20 +405,22 @@ function CreatePaymentGatewayModal({ gateway, onClose, onSuccess }: CreatePaymen
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
+  // Comment out Stripe and Flutterwave from gatewayTypes
   const gatewayTypes = [
-    { value: 'FLUTTERWAVE', label: 'Flutterwave', icon: '🦋' },
+    // { value: 'FLUTTERWAVE', label: 'Flutterwave', icon: '🦋' },
     { value: 'BINANCE', label: 'Binance', icon: '🟡' },
-    { value: 'STRIPE', label: 'Stripe', icon: '💳' }
+    // { value: 'STRIPE', label: 'Stripe', icon: '💳' }
   ]
 
+  // Comment out config templates for Stripe and Flutterwave
   const getConfigTemplate = (gatewayType: string) => {
     switch (gatewayType) {
-      case 'FLUTTERWAVE':
-        return { secretKey: '', publicKey: '', encryptionKey: '' }
+      // case 'FLUTTERWAVE':
+      //   return { secretKey: '', publicKey: '', encryptionKey: '' }
       case 'BINANCE':
         return { apiKey: '', apiSecret: '', webhookSecret: '' }
-      case 'STRIPE':
-        return { secretKey: '', publishableKey: '', webhookSecret: '' }
+      // case 'STRIPE':
+      //   return { secretKey: '', publishableKey: '', webhookSecret: '' }
       default:
         return {}
     }

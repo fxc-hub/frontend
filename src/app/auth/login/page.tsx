@@ -78,7 +78,7 @@ export default function LoginPage() {
 
         {/* Right side form */}
         <div className="flex flex-col items-center justify-center">
-          <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full w-24 h-24 flex items-center justify-center mb-8">
+          <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full w-24 h-24 flex items-center justify-center mb-8">
             <span className="text-3xl font-bold">FX</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">Welcome Back!</h1>
@@ -109,7 +109,7 @@ export default function LoginPage() {
             />
             <button
               type="submit"
-              className="w-full p-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 font-semibold"
+              className="w-full p-3 rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-600 font-semibold"
               disabled={loading}
             >
               {loading ? "Signing in..." : "Get Started"}
@@ -117,10 +117,10 @@ export default function LoginPage() {
           </form>
 
           <div className="flex justify-between w-full max-w-sm mt-4 text-sm">
-            <a href="/auth/forgot-password" className="text-blue-400 hover:underline">
+                            <a href="/auth/forgot-password" className="text-yellow-400 hover:underline">
               Forgot your password?
             </a>
-            <a href="/auth/register" className="text-blue-400 hover:underline">
+                            <a href="/auth/register" className="text-yellow-400 hover:underline">
               Create an account
             </a>
           </div>

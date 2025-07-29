@@ -168,18 +168,18 @@ const PlanSelectionAndPayment = () => {
         {/* Progress Steps */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center space-x-4">
-            <div className={`flex items-center ${currentStep === 'plans' ? 'text-blue-400' : 'text-gray-500'}`}>
+                            <div className={`flex items-center ${currentStep === 'plans' ? 'text-yellow-400' : 'text-gray-500'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                currentStep === 'plans' ? 'border-blue-400 bg-blue-400/10' : 'border-gray-500'
+                                  currentStep === 'plans' ? 'border-yellow-400 bg-yellow-400/10' : 'border-gray-500'
               }`}>
                 1
               </div>
               <span className="ml-2 text-sm font-medium">Select Plan</span>
             </div>
             <ArrowRightIcon className="w-5 h-5 text-gray-500" />
-            <div className={`flex items-center ${currentStep === 'payment' || currentStep === 'processing' ? 'text-blue-400' : 'text-gray-500'}`}>
+                            <div className={`flex items-center ${currentStep === 'payment' || currentStep === 'processing' ? 'text-yellow-400' : 'text-gray-500'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                currentStep === 'payment' || currentStep === 'processing' ? 'border-blue-400 bg-blue-400/10' : 'border-gray-500'
+                                  currentStep === 'payment' || currentStep === 'processing' ? 'border-yellow-400 bg-yellow-400/10' : 'border-gray-500'
               }`}>
                 2
               </div>
@@ -211,7 +211,7 @@ const PlanSelectionAndPayment = () => {
         {currentStep === 'plans' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {plans.map((plan) => (
-              <div key={plan.id} className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-blue-500/50 transition-colors">
+                              <div key={plan.id} className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-yellow-500/50 transition-colors">
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
                   <div className="text-3xl font-bold text-white mb-1">
@@ -288,7 +288,7 @@ const PlanSelectionAndPayment = () => {
                     key={gateway.id}
                     className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
                       selectedGateway?.id === gateway.id
-                        ? 'border-blue-500 bg-blue-500/10'
+                        ? 'border-yellow-500 bg-yellow-500/10'
                         : 'border-gray-600 hover:border-gray-500'
                     }`}
                     onClick={() => handleGatewaySelect(gateway)}
@@ -319,7 +319,7 @@ const PlanSelectionAndPayment = () => {
                       key={method.id}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
                         selectedPaymentMethod === method.id
-                          ? 'border-blue-500 bg-blue-500/10'
+                          ? 'border-yellow-500 bg-yellow-500/10'
                           : 'border-gray-600 hover:border-gray-500'
                       }`}
                       onClick={() => handlePaymentMethodSelect(method.id)}
@@ -375,7 +375,7 @@ const PlanSelectionAndPayment = () => {
               <button
                 onClick={handleSubscribe}
                 disabled={!selectedGateway || !selectedPaymentMethod}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
               >
                 Proceed to Payment
               </button>

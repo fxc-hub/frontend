@@ -150,7 +150,7 @@ export default function CreateAlertModal({ isOpen, onClose, onSuccess }: CreateA
         <div className="p-6 border-b border-gray-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
+                              <div className="bg-yellow-600 p-2 rounded-lg">
                 <BellIcon className="w-6 h-6 text-white" />
               </div>
               <div>

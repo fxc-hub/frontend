@@ -29,19 +29,8 @@ export const usePaymentGateways = () => {
   const [error, setError] = useState('')
 
   const paymentMethods: Record<string, PaymentMethod[]> = {
-    'FLUTTERWAVE': [
-      { id: 'card', name: 'Credit/Debit Card', description: 'Visa, Mastercard, Verve', icon: '💳' },
-      { id: 'bank_transfer', name: 'Bank Transfer', description: 'Direct bank transfer', icon: '🏦' },
-      { id: 'mobile_money', name: 'Mobile Money', description: 'M-Pesa, MTN, Airtel', icon: '📱' },
-      { id: 'ussd', name: 'USSD', description: 'USSD payment', icon: '📞' }
-    ],
-    'STRIPE': [
-      { id: 'card', name: 'Credit/Debit Card', description: 'Visa, Mastercard, Amex', icon: '💳' },
-      { id: 'bank_transfer', name: 'ACH Bank Transfer', description: 'Direct bank transfer', icon: '🏦' },
-      { id: 'sepa_debit', name: 'SEPA Direct Debit', description: 'European bank transfer', icon: '🇪🇺' }
-    ],
     'BINANCE': [
-      { id: 'crypto', name: 'Cryptocurrency', description: 'USDT, Bitcoin, Ethereum, BNB', icon: '🟡' }
+      { id: 'crypto', name: 'Cryptocurrency', description: 'USDT, Bitcoin, Ethereum, BNB', icon: '\ud83d\udfe1' }
     ]
   }
 
@@ -62,10 +51,8 @@ export const usePaymentGateways = () => {
 
   const getGatewayIcon = (gateway: string) => {
     switch (gateway) {
-      case 'FLUTTERWAVE': return '🦋'
-      case 'STRIPE': return '💳'
-      case 'BINANCE': return '🟡'
-      default: return '💳'
+      case 'BINANCE': return '\ud83d\udfe1'
+      default: return '\ud83d\udcb3'
     }
   }
 

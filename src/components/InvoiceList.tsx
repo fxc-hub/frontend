@@ -81,28 +81,6 @@ export default function InvoiceList() {
     }
   }
 
-  const handlePayInvoice = async (invoiceId: string) => {
-    try {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        setError('Authentication required')
-        return
-      }
-
-      const response = await api(`/api/invoices/${invoiceId}/pay`, 'POST', {
-        payment_method: 'card',
-        payment_provider: 'flutterwave'
-      }, token)
-
-      // Redirect to payment URL
-      if (response.data.payment_url) {
-        window.open(response.data.payment_url, '_blank')
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to initiate payment')
-    }
-  }
-
   const handleDownloadInvoice = async (invoiceId: string) => {
     try {
       const token = localStorage.getItem('token')
@@ -299,15 +277,6 @@ export default function InvoiceList() {
                         <ArrowDownTrayIcon className="w-4 h-4" />
                       </button>
                       
-                      {invoice.status !== 'paid' && (
-                        <button
-                          onClick={() => handlePayInvoice(invoice.id)}
-                          className="text-green-600 hover:text-green-900"
-                          title="Pay Invoice"
-                        >
-                          <CreditCardIcon className="w-4 h-4" />
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>

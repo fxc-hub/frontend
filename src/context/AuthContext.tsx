@@ -7,9 +7,21 @@ export interface User {
   id: number;
   first_name: string;
   last_name: string;
+  username: string;
   email: string;
   phone?: string | null;
+  whatsapp?: string | null;
+  mobile?: string | null;
+  date_of_birth?: string | null;
+  gender?: string | null;
+  address?: string | null;
+  country?: string | null;
+  city?: string | null;
+  post_code?: string | null;
+  terms_accepted?: boolean;
+  privacy_accepted?: boolean;
   role: string;
+  created_at?: string;
 }
 
 interface AuthContextProps {
@@ -17,7 +29,26 @@ interface AuthContextProps {
   token: string | null;
   isInitialized: boolean;
   login: (login: string, password: string) => Promise<void>;
-  register: (first_name: string, last_name: string, phone: string | null, email: string, password: string, password_confirmation: string, role?: string) => Promise<{ message: string }>;
+  register: (
+    first_name: string,
+    last_name: string,
+    username: string,
+    phone: string | null,
+    whatsapp: string | null,
+    mobile: string | null,
+    date_of_birth: string,
+    gender: string,
+    address: string,
+    country: string,
+    city: string,
+    post_code: string,
+    email: string,
+    password: string,
+    password_confirmation: string,
+    terms_accepted: boolean,
+    privacy_accepted: boolean,
+    role?: string
+  ) => Promise<{ message: string }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -107,16 +138,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (
     first_name: string,
     last_name: string,
+    username: string,
     phone: string | null,
+    whatsapp: string | null,
+    mobile: string | null,
+    date_of_birth: string,
+    gender: string,
+    address: string,
+    country: string,
+    city: string,
+    post_code: string,
     email: string,
     password: string,
     password_confirmation: string,
+    terms_accepted: boolean,
+    privacy_accepted: boolean,
     role: string = 'trader'
   ) => {
     const data = await api<{ message: string }>(
       '/api/auth/register',
       'POST',
-      { first_name, last_name, phone, email, password, password_confirmation, role }
+      { 
+        first_name, 
+        last_name, 
+        username,
+        phone, 
+        whatsapp,
+        mobile,
+        date_of_birth,
+        gender,
+        address,
+        country,
+        city,
+        post_code,
+        email, 
+        password, 
+        password_confirmation, 
+        terms_accepted,
+        privacy_accepted,
+        role 
+      }
     );
     return data;
   };

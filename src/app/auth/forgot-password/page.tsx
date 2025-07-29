@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
           </form>
         )}
 
-        <a href="/" className="inline-block mt-6 text-blue-400 hover:underline">
+                        <a href="/" className="inline-block mt-6 text-yellow-400 hover:underline">
           Back to Login
         </a>
       </div>

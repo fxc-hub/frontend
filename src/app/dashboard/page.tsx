@@ -22,6 +22,7 @@ import PaymentHistoryTable from '@/components/PaymentHistoryTable'
 import { getStatusColor } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { api } from '@/lib/api'
+import SiteLogo from '@/components/SiteLogo'
 
 interface Plan {
   id: number;
@@ -256,9 +257,9 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
-              <h1 className="text-2xl font-bold text-white">FXCHUB</h1>
+              <SiteLogo className="h-8 w-auto" fallbackText="FXCHUB" />
               <nav className="hidden md:flex space-x-6">
-                <Link href="/dashboard" className="text-blue-400 font-medium">
+                                 <Link href="/dashboard" className="text-yellow-400 font-medium">
                   Dashboard
                 </Link>
                 {/* <Link href="/marketplace" className="text-gray-300 hover:text-white transition-colors">
@@ -269,6 +270,9 @@ export default function DashboardPage() {
                 </Link>
                 <Link href="/economic-news" className="text-gray-300 hover:text-white transition-colors">
                   Economic News
+                </Link>
+                <Link href="/technical-analysis" className="text-gray-300 hover:text-white transition-colors">
+                  Technical Analysis
                 </Link>
                 <Link href="/alerts" className="text-gray-300 hover:text-white transition-colors">
                   Alert
@@ -292,7 +296,7 @@ export default function DashboardPage() {
       <div className="fixed top-20 right-4 z-50">
         <button
           onClick={() => setShowHelp(!showHelp)}
-          className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-colors"
+          className="bg-yellow-600 hover:bg-yellow-700 text-white p-3 rounded-full shadow-lg transition-colors"
           title="Toggle Help"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -379,7 +383,7 @@ Tip: Hover over chart elements for more details, and use the help button anytime
                 onClick={() => setActiveTab('overview')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'overview'
-                    ? 'border-blue-500 text-blue-400'
+                    ? 'border-yellow-500 text-yellow-400'
                     : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
               >
@@ -392,7 +396,7 @@ Tip: Hover over chart elements for more details, and use the help button anytime
                 onClick={() => setActiveTab('trading')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'trading'
-                    ? 'border-blue-500 text-blue-400'
+                    ? 'border-yellow-500 text-yellow-400'
                     : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
               >
@@ -411,7 +415,7 @@ Tip: Hover over chart elements for more details, and use the help button anytime
             {/* User Profile Card */}
             <div className="bg-gray-900 rounded-xl p-6 mb-8">
           <div className="flex items-center mb-6">
-            <div className="bg-blue-600 p-3 rounded-lg mr-4">
+            <div className="bg-yellow-600 p-3 rounded-lg mr-4">
               <UserIcon className="w-8 h-8 text-white" />
             </div>
             <div>
@@ -445,7 +449,7 @@ Tip: Hover over chart elements for more details, and use the help button anytime
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Link href="/scanners" className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl p-6 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+          <Link href="/scanners" className="bg-gradient-to-br from-yellow-600 to-purple-600 rounded-xl p-6 hover:from-yellow-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
             <div className="flex items-center mb-4">
               <div className="bg-white/20 p-3 rounded-lg mr-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -462,7 +466,7 @@ Tip: Hover over chart elements for more details, and use the help button anytime
             </div>
           </Link>
 
-          <Link href="/education-hub" className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl p-6 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105">
+          <Link href="/education-hub" className="bg-gradient-to-br from-yellow-500 to-cyan-500 rounded-xl p-6 hover:from-yellow-600 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105">
             <div className="flex items-center mb-4">
               <div className="bg-white/20 p-3 rounded-lg mr-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -564,7 +568,7 @@ Tip: Hover over chart elements for more details, and use the help button anytime
               </p>
               <button
                 onClick={() => setShowSubscribeModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+                className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg transition-colors"
               >
                 Choose Plan
               </button>
@@ -603,11 +607,11 @@ Tip: Hover over chart elements for more details, and use the help button anytime
                   <div 
                     key={plan.id} 
                     className={`bg-gray-800 rounded-lg p-6 border ${
-                      index === 1 ? 'border-blue-500' : 'border-gray-700'
+                      index === 1 ? 'border-yellow-500' : 'border-gray-700'
                     }`}
                   >
                     {index === 1 && (
-                      <div className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full inline-block mb-4">
+                      <div className="bg-yellow-600 text-white text-sm px-3 py-1 rounded-full inline-block mb-4">
                         Most Popular
                       </div>
                     )}
@@ -626,7 +630,7 @@ Tip: Hover over chart elements for more details, and use the help button anytime
                     </ul>
                     <button
                       onClick={() => handleSubscribe(plan.id.toString())}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-colors"
+                      className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 rounded-lg transition-colors"
                     >
                       Subscribe
                     </button>

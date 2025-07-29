@@ -19,14 +19,16 @@ import {
   ArrowRightOnRectangleIcon,
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline'
-import PaymentGatewayManager from '@/components/admin/PaymentGatewayManager'
 import SecurityManager from '@/components/admin/SecurityManager'
 import IndicatorManager from '@/components/admin/IndicatorManager'
+import ChartManager from '@/components/admin/ChartManager'
 import AdminLayout from '@/components/AdminLayout'
 import AdminRouteGuard from '@/components/admin/AdminRouteGuard'
 import { Dialog } from '@headlessui/react'
 import Link from 'next/link'
 import { api } from '@/lib/api'
+import PaymentGatewayManager from '@/components/admin/PaymentGatewayManager'
+import LogoUpload from '@/components/admin/LogoUpload'
 
 interface User {
   id: string
@@ -649,8 +651,24 @@ export default function AdminPage() {
     }
   }
 
-  const handleSiteSettingChange = (idx: number, _k: string, value: string) => {
-    setSiteSettings(prev => prev.map((s,i)=> i===idx ? { ...s, value } : s))
+  const handleSiteSettingChange = (idx: number, key: string, value: string) => {
+    setSiteSettings(prev => {
+      if (idx === -1) {
+        // Setting doesn't exist yet, add it
+        return [...prev, {
+          id: null,
+          category: 'General',
+          key: key,
+          value: value,
+          logo: null,
+          createdAt: null,
+          updatedAt: null
+        }]
+      } else {
+        // Setting exists, update it
+        return prev.map((s, i) => i === idx ? { ...s, value } : s)
+      }
+    })
   }
 
   const saveSiteSettings = async () => {
@@ -1391,6 +1409,11 @@ export default function AdminPage() {
           <IndicatorManager />
         )}
 
+        {/* Chart Manager */}
+        {activeTab === 'chart-manager' && (
+          <ChartManager />
+        )}
+
         {/* API Settings Table */}
         {activeTab === 'settings' && (
         <div className="bg-gray-900 rounded-xl p-6">
@@ -1688,16 +1711,6 @@ export default function AdminPage() {
         </div>
         )}
 
-        {/* Payment Gateways Tab */}
-        {activeTab === 'payments' && (
-          <PaymentGatewayManager 
-            onSuccess={() => {
-              const token = localStorage.getItem('token')
-              if (token) fetchAdminData(token)
-            }}
-          />
-        )}
-
         {/* Security Tab */}
         {activeTab === 'security' && (
           <SecurityManager />
@@ -1746,6 +1759,25 @@ export default function AdminPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Logo Upload */}
+              <div className="bg-gray-900 rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Logo Upload</h3>
+                <LogoUpload
+                  currentLogoUrl={siteSettings.find(s => s.key === 'site_logo')?.logo || ''}
+                  onLogoUploaded={(logoUrl) => {
+                    // Update the site settings with the new logo URL
+                    const updatedSettings = siteSettings.map(s => 
+                      s.key === 'site_logo' ? { ...s, logo: logoUrl } : s
+                    )
+                    setSiteSettings(updatedSettings)
+                  }}
+                  onError={(error) => {
+                    setSiteSettingsError(error)
+                    setTimeout(() => setSiteSettingsError(''), 5000)
+                  }}
+                />
+              </div>
+
               {/* Brand Identity */}
               <div className="bg-gray-900 rounded-xl p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Brand Identity</h3>
@@ -1759,18 +1791,10 @@ export default function AdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Logo URL</label>
-                    <input
-                      type="url"
-                      placeholder="https://example.com/logo.png"
-                      className="w-full bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
-                    />
-                  </div>
-                  <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Primary Color</label>
                     <input
                       type="color"
-                      defaultValue="#3B82F6"
+                      defaultValue="#EAB308"
                       className="w-full h-10 bg-gray-800 border border-gray-600 rounded-lg"
                     />
                   </div>
@@ -1808,32 +1832,10 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* White-label Options */}
-              <div className="bg-gray-900 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">White-label Options</h3>
-                <div className="space-y-4">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-3" />
-                    <span className="text-gray-300">Hide FXCHUB Branding</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-3" />
-                    <span className="text-gray-300">Custom Domain</span>
-                  </label>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Custom Footer Text</label>
-                    <textarea
-                      placeholder="© 2024 Your Company. All rights reserved."
-                      className="w-full bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2 h-20"
-                    />
-                  </div>
-                </div>
-              </div>
-
               {/* Save Button */}
               <div className="bg-gray-900 rounded-xl p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Actions</h3>
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors">
                   Save Branding Settings
                 </button>
                 <p className="text-gray-400 text-sm mt-2">
@@ -2432,32 +2434,72 @@ export default function AdminPage() {
         </Dialog>
       )}
 
-      {/* Site Settings */}
+      {/* Site Settings Tab */}
       {activeTab === 'site-settings' && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold text-white">Site Settings</h2>
-          {siteSettingsError && <div className="bg-red-500/10 text-red-400 p-3 rounded-lg">{siteSettingsError}</div>}
-          {siteSettingsSuccess && <div className="bg-green-500/10 text-green-300 p-3 rounded-lg">{siteSettingsSuccess}</div>}
-          {siteSettingsLoading ? (
-            <div className="text-gray-400">Loading...</div>
-          ) : (
-            <div className="space-y-4">
-              {siteSettings.map((setting, idx) => (
-                <div key={idx} className="grid grid-cols-4 gap-4 items-center bg-gray-800 p-4 rounded-lg">
-                  <div className="col-span-1 text-gray-300 text-sm">{setting.category}</div>
-                  <div className="col-span-1 text-gray-300 text-sm">{setting.key}</div>
-                  <input value={setting.value} onChange={e=>handleSiteSettingChange(idx,'value',e.target.value)} className="col-span-2 form-input" />
-                </div>
-              ))}
-              {siteSettings.length === 0 && <p className="text-gray-400 text-sm">No settings found.</p>}
+        <div className="bg-gray-900 rounded-xl p-6">
+          <h2 className="text-xl font-bold text-white mb-6">Site Settings</h2>
+          {siteSettingsError && (
+            <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 mb-6">
+              <p className="text-red-400">{siteSettingsError}</p>
             </div>
           )}
-          <div className="pt-4 flex justify-end">
-            <button onClick={saveSiteSettings} disabled={siteSettingsSaving} className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg">
+          <form onSubmit={e => { e.preventDefault(); saveSiteSettings(); }} className="space-y-6">
+              {siteSettings.map((setting, idx) => (
+              <div key={setting.key} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                <label className="block text-sm font-medium text-gray-300">
+                  {setting.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </label>
+                <input
+                  type="text"
+                  value={setting.value}
+                  onChange={e => handleSiteSettingChange(idx, setting.key, e.target.value)}
+                  className="w-full bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
+                />
+                </div>
+              ))}
+            {/* Homepage Images */}
+            {[1,2,3,4].map(i => {
+              const key = `homepage_image_${i}`;
+              const existingSetting = siteSettings.find(s => s.key === key);
+              const value = existingSetting ? existingSetting.value : '';
+              return (
+                <div key={key} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Homepage Image {i} URL
+                  </label>
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={e => handleSiteSettingChange(existingSetting ? siteSettings.findIndex(s => s.key === key) : -1, key, e.target.value)}
+                    className="w-full bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
+                    placeholder={`https://yourdomain.com/path/to/image${i}.jpg`}
+                  />
+                </div>
+              );
+            })}
+            <div className="flex justify-end space-x-3">
+              <button
+                type="submit"
+                disabled={siteSettingsSaving}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg disabled:opacity-50"
+              >
               {siteSettingsSaving ? 'Saving...' : 'Save Settings'}
             </button>
+              {siteSettingsSuccess && (
+                <span className="text-green-400 ml-4">{siteSettingsSuccess}</span>
+              )}
           </div>
+          </form>
         </div>
+      )}
+
+      {activeTab === 'payments' && (
+        <PaymentGatewayManager
+          onSuccess={() => {
+            const token = localStorage.getItem('token')
+            if (token) fetchAdminData(token)
+          }}
+        />
       )}
     </AdminLayout>
     </AdminRouteGuard>
@@ -2962,17 +3004,6 @@ const CreateNotificationModal = ({ onClose, onSuccess }: { onClose: () => void, 
         { key: 'from_name', label: 'From Name', type: 'text', required: false, placeholder: 'FXCHUB' }
       ]
     },
-    SMS: {
-      name: 'SMS Notifications',
-      description: 'Send SMS notifications via Twilio, Nexmo, or other providers',
-      configFields: [
-        { key: 'provider_name', label: 'SMS Provider', type: 'select', required: true, options: ['twilio', 'nexmo', 'messagebird'] },
-        { key: 'api_key', label: 'API Key', type: 'password', required: true, placeholder: 'Your API key' },
-        { key: 'api_secret', label: 'API Secret', type: 'password', required: false, placeholder: 'API secret (if required)' },
-        { key: 'account_sid', label: 'Account SID', type: 'text', required: false, placeholder: 'For Twilio' },
-        { key: 'from_number', label: 'From Number', type: 'tel', required: true, placeholder: '+1234567890' }
-      ]
-    },
     TELEGRAM: {
       name: 'Telegram Bot',
       description: 'Send notifications via Telegram bot',
@@ -2988,23 +3019,6 @@ const CreateNotificationModal = ({ onClose, onSuccess }: { onClose: () => void, 
         { key: 'vapid_public_key', label: 'VAPID Public Key', type: 'text', required: true, placeholder: 'VAPID public key' },
         { key: 'vapid_private_key', label: 'VAPID Private Key', type: 'password', required: true, placeholder: 'VAPID private key' },
         { key: 'subject', label: 'Subject', type: 'email', required: true, placeholder: 'mailto:support@fxchub.com' }
-      ]
-    },
-    DISCORD: {
-      name: 'Discord Webhook',
-      description: 'Send notifications to Discord channels',
-      configFields: [
-        { key: 'webhook_url', label: 'Webhook URL', type: 'url', required: true, placeholder: 'https://discord.com/api/webhooks/...' },
-        { key: 'username', label: 'Bot Username', type: 'text', required: false, placeholder: 'FXCHUB' }
-      ]
-    },
-    SLACK: {
-      name: 'Slack Webhook',
-      description: 'Send notifications to Slack channels',
-      configFields: [
-        { key: 'webhook_url', label: 'Webhook URL', type: 'url', required: true, placeholder: 'https://hooks.slack.com/services/...' },
-        { key: 'username', label: 'Bot Username', type: 'text', required: false, placeholder: 'FXCHUB' },
-        { key: 'channel', label: 'Default Channel', type: 'text', required: false, placeholder: '#alerts' }
       ]
     }
   }
@@ -3221,17 +3235,6 @@ const CreateNotificationModal = ({ onClose, onSuccess }: { onClose: () => void, 
                           <li>• Enable 2-factor authentication</li>
                           <li>• Generate an App Password</li>
                           <li>• Use App Password instead of your regular password</li>
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {selectedProvider === 'SMS' && (
-                      <div className="space-y-3">
-                        <h4 className="text-sm font-medium text-white">SMS Providers:</h4>
-                        <ul className="text-xs text-gray-300 space-y-1">
-                          <li>• Twilio: Reliable, good documentation</li>
-                          <li>• Nexmo: Good international coverage</li>
-                          <li>• MessageBird: Competitive pricing</li>
                         </ul>
                       </div>
                     )}

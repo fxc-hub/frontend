@@ -10,6 +10,7 @@ import {
   ChartBarIcon,
   CurrencyDollarIcon
 } from '@heroicons/react/24/outline'
+import { api } from '../lib/api'
 
 interface CurrencyPair {
   symbol: string
@@ -64,15 +65,25 @@ const ForexScanner: React.FC<ForexScannerProps> = ({ onPairSelect }) => {
   // Fetch real or mock forex data
   const fetchForexData = async (): Promise<CurrencyPair[]> => {
     try {
-      const response = await fetch('/api/forex/data')
-      if (response.ok) {
-        const data = await response.json()
-        return data
+      // Try to fetch from backend API first
+      const token = localStorage.getItem('token')
+      if (token) {
+        try {
+          const response = await api('/forex/dashboard', 'GET', undefined, token)
+          if (response.data && response.data.pairs) {
+            return response.data.pairs
+          }
+        } catch (apiError) {
+          console.error('Error fetching forex data from API:', apiError)
+        }
       }
+      
+      // Fallback to mock data if API fails or no token
+      return generateMockData()
     } catch (error) {
       console.error('Error fetching forex data:', error)
+      return generateMockData()
     }
-    return generateMockData()
   }
 
   // Generate mock forex data with realistic values (fallback)

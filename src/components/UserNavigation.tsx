@@ -83,7 +83,7 @@ export default function UserNavigation({ userInfo, onLogout }: UserNavigationPro
               href={item.href}
               className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
                 isActive(item.href)
-                  ? 'text-blue-400 font-medium'
+                  ? 'text-yellow-400 font-medium'
                   : 'text-gray-300 hover:text-white'
               }`}
             >
@@ -221,7 +221,7 @@ export default function UserNavigation({ userInfo, onLogout }: UserNavigationPro
                     href={item.href}
                     className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                       isActive(item.href)
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-yellow-600 text-white'
                         : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                     }`}
                     onClick={() => setMobileMenuOpen(false)}

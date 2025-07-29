@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import { 
-  PlusIcon, 
   TrashIcon, 
   PencilIcon,
   EyeIcon,
@@ -34,7 +33,6 @@ interface Indicator {
   tags?: string[]
   isPremium: boolean
   subscriptionTier: 'FREE' | 'PRO' | 'VIP'
-  price: number
   isActive: boolean
   rating: number
   reviewCount: number
@@ -49,7 +47,6 @@ interface IndicatorManagerProps {
 const IndicatorManager: React.FC<IndicatorManagerProps> = ({ onIndicatorChange }) => {
   const [indicators, setIndicators] = useState<Indicator[]>([])
   const [loading, setLoading] = useState(true)
-  const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingIndicator, setEditingIndicator] = useState<Indicator | null>(null)
   const [showPineEditor, setShowPineEditor] = useState(false)
   const [selectedIndicator, setSelectedIndicator] = useState<Indicator | null>(null)
@@ -118,38 +115,32 @@ const IndicatorManager: React.FC<IndicatorManagerProps> = ({ onIndicatorChange }
 
       if (response.ok) {
         const data = await response.json()
-        const twelveDataSetting = data.settings.find((s: any) => s.name === 'twelve_data_api_key')
-        setApiSettings({
-          twelveDataApiKey: twelveDataSetting?.value || '',
-          isConnected: !!twelveDataSetting?.value
-        })
+        // Add null checks for data.settings
+        if (data && data.settings && Array.isArray(data.settings)) {
+          const twelveDataSetting = data.settings.find((s: any) => s.name === 'twelve_data_api_key')
+          setApiSettings({
+            twelveDataApiKey: twelveDataSetting?.value || '',
+            isConnected: !!twelveDataSetting?.value
+          })
+        } else {
+          // Set default values if settings are not available
+          setApiSettings({
+            twelveDataApiKey: '',
+            isConnected: false
+          })
+        }
       }
     } catch (error) {
       console.error('Failed to load API settings:', error)
-    }
-  }
-
-  const createIndicator = async (indicatorData: Partial<Indicator>) => {
-    try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('/api/admin/indicators', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(indicatorData)
+      // Set default values on error
+      setApiSettings({
+        twelveDataApiKey: '',
+        isConnected: false
       })
-
-      if (response.ok) {
-        await loadIndicators()
-        setShowCreateModal(false)
-        setEditingIndicator(null)
-      }
-    } catch (error) {
-      console.error('Failed to create indicator:', error)
     }
   }
+
+
 
   const updateIndicator = async (id: string, indicatorData: Partial<Indicator>) => {
     try {
@@ -468,7 +459,7 @@ const IndicatorManager: React.FC<IndicatorManagerProps> = ({ onIndicatorChange }
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <QuestionMarkCircleIcon className="w-6 h-6 text-blue-400 mr-3" />
-              <h2 className="text-xl font-semibold text-white">How Indicators Management Works</h2>
+              <h2 className="text-xl font-semibold text-white">Custom Indicators Management Guide</h2>
             </div>
             {showHelp ? (
               <ChevronDownIcon className="w-5 h-5 text-gray-400" />
@@ -480,111 +471,83 @@ const IndicatorManager: React.FC<IndicatorManagerProps> = ({ onIndicatorChange }
         
         {showHelp && (
           <div className="p-6 space-y-6">
-            {/* TradingView Integration */}
+            {/* Overview */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-white flex items-center">
                 <ChartBarIcon className="w-5 h-5 mr-2 text-blue-400" />
-                TradingView Account Integration
+                Custom Indicators Overview
               </h3>
               <div className="bg-gray-700 rounded-lg p-4 space-y-3">
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-white">Indicator Sources</h4>
+                    <h4 className="font-medium text-white">JavaScript-Based Indicators</h4>
                     <p className="text-gray-300 text-sm">
-                      Import indicators from your TradingView account, including built-in indicators, custom Pine Scripts, and community indicators.
+                      Create custom technical indicators using JavaScript. Your indicators will run in real-time on the Advanced TradingView Chart Library.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-white">Pine Script Support</h4>
+                    <h4 className="font-medium text-white">Real-Time Execution</h4>
                     <p className="text-gray-300 text-sm">
-                      Upload and validate custom Pine Script indicators. The system automatically validates syntax and provides error feedback.
+                      Custom indicators are executed server-side with live market data and rendered instantly on user charts.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-white">Real-time Data</h4>
+                    <h4 className="font-medium text-white">Subscription Integration</h4>
                     <p className="text-gray-300 text-sm">
-                      Connect to Twelve Data API for real-time forex data that powers your indicators and charts.
+                      Control access to premium indicators through subscription tiers (FREE, PRO, VIP).
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* LightweightChart Integration */}
+            {/* Technical Features */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-white flex items-center">
                 <CogIcon className="w-5 h-5 mr-2 text-green-400" />
-                LightweightChart Integration
+                Technical Features
               </h3>
               <div className="bg-gray-700 rounded-lg p-4 space-y-3">
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-white">Chart Rendering</h4>
+                    <h4 className="font-medium text-white">Built-in Functions</h4>
                     <p className="text-gray-300 text-sm">
-                      Indicators are automatically rendered on the LightweightChart component using TradingView's lightweight charts library.
+                      Access to SMA, EMA, RSI, ATR, and other technical analysis functions in your custom indicators.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-white">Dynamic Loading</h4>
+                    <h4 className="font-medium text-white">Parameter Support</h4>
                     <p className="text-gray-300 text-sm">
-                      Users can add/remove indicators dynamically from the chart interface. Built-in indicators are calculated server-side, while Pine Scripts are executed in real-time.
+                      Create configurable indicators with adjustable parameters that users can modify.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-white">Performance Optimization</h4>
+                    <h4 className="font-medium text-white">Real-Time Data</h4>
                     <p className="text-gray-300 text-sm">
-                      Indicators are cached and optimized for smooth real-time updates. Multiple indicators can run simultaneously without performance degradation.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Subscription Integration */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white flex items-center">
-                <CheckCircleIcon className="w-5 h-5 mr-2 text-purple-400" />
-                Subscription Plans Integration
-              </h3>
-              <div className="bg-gray-700 rounded-lg p-4 space-y-3">
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div>
-                    <h4 className="font-medium text-white">Tier-based Access</h4>
-                    <p className="text-gray-300 text-sm">
-                      Indicators are categorized by subscription tiers that you create in the "Plans Management" module. Users can only access indicators matching their current subscription level.
+                      Indicators receive live OHLC data and calculate values in real-time for accurate analysis.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-white">Plan Management</h4>
+                    <h4 className="font-medium text-white">Chart Integration</h4>
                     <p className="text-gray-300 text-sm">
-                      Create and manage subscription plans in the "Plans Management" module. Premium indicators are automatically unlocked when users upgrade their subscription.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div>
-                    <h4 className="font-medium text-white">Revenue Generation</h4>
-                    <p className="text-gray-300 text-sm">
-                      Premium indicators can be monetized. Set pricing for individual indicators or create indicator bundles that align with your custom subscription plans.
+                      Seamless integration with both TradingView embedded charts and Advanced TradingView Chart Library.
                     </p>
                   </div>
                 </div>
@@ -595,19 +558,20 @@ const IndicatorManager: React.FC<IndicatorManagerProps> = ({ onIndicatorChange }
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-white flex items-center">
                 <PlayIcon className="w-5 h-5 mr-2 text-yellow-400" />
-                Quick Start Guide
+                Workflow Guide
               </h3>
               <div className="bg-gray-700 rounded-lg p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <h4 className="font-medium text-white">For Administrators:</h4>
                     <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
-                      <li>Configure Twelve Data API key in the settings above</li>
-                      <li>Create subscription plans in the "Plans Management" module</li>
-                      <li>Upload or create indicators using the "Add Indicator" button</li>
+                      <li>Configure API settings for real-time data access</li>
+                      <li>Create subscription plans in "Plans Management"</li>
+                      <li>Upload custom JavaScript indicators using "Upload JavaScript Indicator"</li>
                       <li>Set appropriate subscription tiers for each indicator</li>
-                      <li>Test indicators using the Pine Script editor</li>
+                      <li>Test indicators using the provided templates</li>
                       <li>Activate indicators for user access</li>
+                      <li>Configure chart integration in "Integrate Chart" module</li>
                     </ol>
                   </div>
                   <div className="space-y-3">
@@ -615,10 +579,85 @@ const IndicatorManager: React.FC<IndicatorManagerProps> = ({ onIndicatorChange }
                     <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
                       <li>Navigate to the Scanners page to access charts</li>
                       <li>Select indicators based on your subscription tier</li>
-                      <li>Add indicators to your chart for real-time analysis</li>
-                      <li>Customize indicator parameters as needed</li>
+                      <li>Add custom indicators to your chart for real-time analysis</li>
+                      <li>Adjust indicator parameters as needed</li>
                       <li>Save chart templates for future use</li>
+                      <li>Switch between TradingView and Advanced charts</li>
                     </ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Code Examples */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-white flex items-center">
+                <CodeBracketIcon className="w-5 h-5 mr-2 text-purple-400" />
+                Quick Code Examples
+              </h3>
+              <div className="bg-gray-700 rounded-lg p-4 space-y-3">
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-medium text-white">Basic Structure</h4>
+                    <p className="text-gray-300 text-sm">
+                      All custom indicators must include a <code className="bg-gray-600 px-1 rounded">calculateIndicator(candles, parameters)</code> function.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-medium text-white">Available Data</h4>
+                    <p className="text-gray-300 text-sm">
+                      Access <code className="bg-gray-600 px-1 rounded">candles[i].open</code>, <code className="bg-gray-600 px-1 rounded">candles[i].high</code>, <code className="bg-gray-600 px-1 rounded">candles[i].low</code>, <code className="bg-gray-600 px-1 rounded">candles[i].close</code>, <code className="bg-gray-600 px-1 rounded">candles[i].volume</code>, <code className="bg-gray-600 px-1 rounded">candles[i].timestamp</code>
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-medium text-white">Return Format</h4>
+                    <p className="text-gray-300 text-sm">
+                      Return array of objects: <code className="bg-gray-600 px-1 rounded">{'{ datetime: timestamp, value: number }'}</code>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Integration Info */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-white flex items-center">
+                <CheckCircleIcon className="w-5 h-5 mr-2 text-teal-400" />
+                Chart Integration
+              </h3>
+              <div className="bg-gray-700 rounded-lg p-4 space-y-3">
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-teal-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-medium text-white">TradingView Embedded Charts</h4>
+                    <p className="text-gray-300 text-sm">
+                      Use the "Integrate Chart" module to configure TradingView embedded charts with your custom indicators.
+                    </p>
+                  </div>
+                  </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-teal-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-medium text-white">Advanced TradingView Chart Library</h4>
+                    <p className="text-gray-300 text-sm">
+                      Custom indicators automatically render on the Advanced TradingView Chart Library for enhanced performance.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-teal-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-medium text-white">Dashboard Integration</h4>
+                    <p className="text-gray-300 text-sm">
+                      Charts configured in admin panel automatically appear on the dashboard scanner page for users.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -638,14 +677,7 @@ const IndicatorManager: React.FC<IndicatorManagerProps> = ({ onIndicatorChange }
                 className="flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
               >
                 <CodeBracketIcon className="w-4 h-4 mr-2" />
-                Upload JavaScript
-              </button>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                <PlusIcon className="w-4 h-4 mr-2" />
-                Add Indicator
+                Upload JavaScript Indicator
               </button>
             </div>
           </div>
@@ -746,30 +778,7 @@ const IndicatorManager: React.FC<IndicatorManagerProps> = ({ onIndicatorChange }
       </div>
 
       {/* Create/Edit Indicator Modal */}
-      {(showCreateModal || editingIndicator) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
-            <h3 className="text-lg font-semibold mb-4 text-white">
-              {editingIndicator ? 'Edit Indicator' : 'Create New Indicator'}
-            </h3>
-            <IndicatorForm
-              indicator={editingIndicator}
-              plans={plans}
-              onSubmit={(data) => {
-                if (editingIndicator) {
-                  updateIndicator(editingIndicator.id, data)
-                } else {
-                  createIndicator(data)
-                }
-              }}
-              onCancel={() => {
-                setShowCreateModal(false)
-                setEditingIndicator(null)
-              }}
-            />
-          </div>
-        </div>
-      )}
+
 
       {/* Indicator Details Modal */}
       {selectedIndicator && (
@@ -802,160 +811,132 @@ const IndicatorManager: React.FC<IndicatorManagerProps> = ({ onIndicatorChange }
                 ×
               </button>
             </div>
+            
+            {/* Help Section */}
+            <div className="mb-6 p-4 bg-gray-700 rounded-lg">
+              <h4 className="text-white font-medium mb-2">How to Write Custom Indicators</h4>
+              <p className="text-gray-300 text-sm mb-3">
+                Your JavaScript code must include a <code className="bg-gray-600 px-1 rounded">calculateIndicator</code> function that returns an array of values.
+              </p>
+              
+              <details className="text-sm">
+                <summary className="text-blue-400 cursor-pointer hover:text-blue-300">View Sample Code Templates</summary>
+                <div className="mt-3 space-y-4">
+                  
+                  {/* Simple Moving Average Template */}
+                  <div className="bg-gray-600 p-3 rounded">
+                    <h5 className="text-yellow-400 font-medium mb-2">Simple Moving Average Template:</h5>
+                    <pre className="text-xs text-green-200 overflow-x-auto">
+{`function calculateIndicator(candles, parameters) {
+  const period = parameters.period || 20;
+  const closes = candles.map(c => c.close);
+  const result = [];
+  
+  for (let i = period - 1; i < closes.length; i++) {
+    const sum = closes.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
+    const sma = sum / period;
+    result.push({
+      datetime: candles[i].timestamp,
+      value: sma
+    });
+  }
+  
+  return result;
+}`}
+                    </pre>
+                  </div>
+
+                  {/* RSI Template */}
+                  <div className="bg-gray-600 p-3 rounded">
+                    <h5 className="text-yellow-400 font-medium mb-2">RSI Template:</h5>
+                    <pre className="text-xs text-green-200 overflow-x-auto">
+{`function calculateIndicator(candles, parameters) {
+  const period = parameters.period || 14;
+  const closes = candles.map(c => c.close);
+  const result = [];
+  
+  for (let i = period; i < closes.length; i++) {
+    let gains = 0, losses = 0;
+    
+    for (let j = i - period + 1; j <= i; j++) {
+      const change = closes[j] - closes[j - 1];
+      if (change > 0) gains += change;
+      else losses += Math.abs(change);
+    }
+    
+    const avgGain = gains / period;
+    const avgLoss = losses / period;
+    const rs = avgGain / avgLoss;
+    const rsi = 100 - (100 / (1 + rs));
+    
+    result.push({
+      datetime: candles[i].timestamp,
+      value: rsi
+    });
+  }
+  
+  return result;
+}`}
+                    </pre>
+      </div>
+
+                  {/* Custom Strategy Template */}
+                  <div className="bg-gray-600 p-3 rounded">
+                    <h5 className="text-yellow-400 font-medium mb-2">Custom Strategy Template:</h5>
+                    <pre className="text-xs text-green-200 overflow-x-auto">
+{`function calculateIndicator(candles, parameters) {
+  const fastPeriod = parameters.fastPeriod || 12;
+  const slowPeriod = parameters.slowPeriod || 26;
+  const closes = candles.map(c => c.close);
+  const result = [];
+  
+  // Calculate fast and slow EMAs
+  const fastEMA = calculateEMA(closes, fastPeriod);
+  const slowEMA = calculateEMA(closes, slowPeriod);
+  
+  for (let i = Math.max(fastPeriod, slowPeriod) - 1; i < closes.length; i++) {
+    const fastIndex = i - fastPeriod + 1;
+    const slowIndex = i - slowPeriod + 1;
+    
+    const signal = fastEMA[fastIndex] > slowEMA[slowIndex] ? 1 : 0;
+    
+    result.push({
+      datetime: candles[i].timestamp,
+      value: signal
+    });
+  }
+  
+  return result;
+}
+
+function calculateEMA(values, period) {
+  const multiplier = 2 / (period + 1);
+  const result = [];
+  let ema = values.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  result.push(ema);
+  
+  for (let i = period; i < values.length; i++) {
+    ema = (values[i] * multiplier) + (ema * (1 - multiplier));
+    result.push(ema);
+  }
+  
+  return result;
+}`}
+                    </pre>
+        </div>
+        </div>
+              </details>
+      </div>
+
             <JavaScriptEditorModal onUpload={uploadJavaScript} onCancel={() => setShowJsEditor(false)} />
-          </div>
+        </div>
         </div>
       )}
-    </div>
+      </div>
   )
 }
 
-// Indicator Form Component
-interface IndicatorFormProps {
-  indicator?: Indicator | null
-  plans: any[]
-  onSubmit: (data: Partial<Indicator>) => void
-  onCancel: () => void
-}
 
-const IndicatorForm: React.FC<IndicatorFormProps> = ({ indicator, plans, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    name: indicator?.name || '',
-    displayName: indicator?.displayName || '',
-    description: indicator?.description || '',
-    category: indicator?.category || 'MOMENTUM',
-    type: indicator?.type || 'BUILT_IN',
-    subscriptionTier: indicator?.subscriptionTier || (plans.length > 0 ? plans[0].name : 'FREE'),
-    price: indicator?.price || 0,
-    isActive: indicator?.isActive ?? true
-  })
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit(formData)
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Display Name</label>
-          <input
-            type="text"
-            value={formData.displayName}
-            onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
-            required
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
-        <textarea
-          value={formData.description}
-          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-          className="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
-          rows={3}
-        />
-      </div>
-
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Category</label>
-          <select
-            value={formData.category}
-            onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
-          >
-            <option value="MOMENTUM">Momentum</option>
-            <option value="TREND">Trend</option>
-            <option value="VOLATILITY">Volatility</option>
-            <option value="VOLUME">Volume</option>
-            <option value="CUSTOM">Custom</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Type</label>
-          <select
-            value={formData.type}
-            onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
-            className="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
-          >
-            <option value="BUILT_IN">Built-in</option>
-            <option value="JS_SCRIPT">JavaScript Script</option>
-            <option value="CUSTOM">Custom</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Subscription Tier</label>
-          <select
-            value={formData.subscriptionTier}
-            onChange={(e) => setFormData(prev => ({ ...prev, subscriptionTier: e.target.value as any }))}
-            className="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
-          >
-            {plans.map((plan) => (
-              <option key={plan.id} value={plan.name}>
-                {plan.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Price</label>
-          <input
-            type="number"
-            step="0.01"
-            value={formData.price}
-            onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-            className="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
-          />
-        </div>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="isActive"
-            checked={formData.isActive}
-            onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-            className="mr-2"
-          />
-          <label htmlFor="isActive" className="text-sm font-medium text-gray-300">
-            Active
-          </label>
-        </div>
-      </div>
-
-      <div className="flex justify-end space-x-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 text-gray-300 bg-gray-600 rounded-md hover:bg-gray-500 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          {indicator ? 'Update' : 'Create'}
-        </button>
-      </div>
-    </form>
-  )
-}
 
 // Indicator Details Component
 interface IndicatorDetailsProps {
@@ -990,10 +971,7 @@ const IndicatorDetails: React.FC<IndicatorDetailsProps> = ({ indicator }) => {
           <span className="font-medium text-gray-300">Subscription Tier:</span>
           <span className="ml-2 text-white">{indicator.subscriptionTier}</span>
         </div>
-        <div>
-          <span className="font-medium text-gray-300">Price:</span>
-          <span className="ml-2 text-white">${indicator.price}</span>
-        </div>
+
         <div>
           <span className="font-medium text-gray-300">Status:</span>
           <span className={`ml-2 ${indicator.isActive ? 'text-green-400' : 'text-red-400'}`}>
@@ -1041,7 +1019,6 @@ const JavaScriptEditorModal = ({ onUpload, onCancel }: { onUpload: (data: any) =
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('CUSTOM');
   const [subscriptionTier, setSubscriptionTier] = useState('FREE');
-  const [price, setPrice] = useState(0);
 
   const handleUpload = () => {
     if (!displayName || !jsCode) {
@@ -1060,8 +1037,7 @@ const JavaScriptEditorModal = ({ onUpload, onCancel }: { onUpload: (data: any) =
       changelog: 'Initial upload',
       tags: ['custom', 'js-script'],
       isPremium: false,
-      subscriptionTier,
-      price
+      subscriptionTier
     });
   };
 
@@ -1123,16 +1099,7 @@ const JavaScriptEditorModal = ({ onUpload, onCancel }: { onUpload: (data: any) =
           <option value="VIP">VIP</option>
         </select>
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-300 mb-1">Price</label>
-        <input
-          type="number"
-          step="0.01"
-          value={price}
-          onChange={e => setPrice(parseFloat(e.target.value) || 0)}
-          className="w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
-        />
-      </div>
+
       <div className="flex justify-end space-x-2">
         <button
           type="button"

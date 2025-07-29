@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { NotificationProvider } from "@/components/NotificationSystem";
 
 export const metadata: Metadata = {
   title: `${process.env.NEXT_PUBLIC_APP_NAME ?? 'FXCHUB'} - Forex Trading Platform`,
@@ -20,7 +21,9 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             <SettingsProvider>
-              {children}
+              <NotificationProvider>
+                {children}
+              </NotificationProvider>
             </SettingsProvider>
           </ThemeProvider>
         </AuthProvider>
