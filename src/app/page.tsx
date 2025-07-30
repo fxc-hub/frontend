@@ -155,7 +155,7 @@ export default function LoginPage() {
             </div>
             <h2 className="text-4xl font-bold text-white mb-2">Welcome Back!</h2>
             <p className="text-gray-400 text-lg">
-              Sign in with your email and password to access all that FXC-Hub has to offer. 
+              Sign in with your email and password to access all that FXCHub has to offer. 
               Your journey begins now!
             </p>
           </div>
