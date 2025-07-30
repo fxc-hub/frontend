@@ -86,6 +86,16 @@ jobs:
     - name: Build application
       run: npm run build -- --no-lint
 
+    - name: Copy files to VPS
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: 22
+        source: "."
+        target: "/home/fxc-hub.com/public_html"
+        strip_components: 0
         
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v1.0.3
@@ -94,8 +104,6 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
         port: 22
-        source: "."
-        target: "/home/fxc-hub.com/public_html"
         script: |
           echo "Starting frontend deployment to main domain..."
           
@@ -121,8 +129,16 @@ jobs:
           echo "Clearing current content..."
           find . -maxdepth 1 ! -name '.' ! -name 'backup-*' -exec rm -rf {} +
           
-          # Files are already copied by the ssh-action
+          # Files are copied by the scp-action
           echo "Files copied from GitHub repository"
+          
+          # Verify files are present
+          echo "Verifying files..."
+          if [ ! -f "package.json" ]; then
+            echo "❌ package.json not found - deployment failed"
+            exit 1
+          fi
+          echo "✅ package.json found"
           
           # Install dependencies
           echo "Installing dependencies..."
