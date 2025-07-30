@@ -2447,7 +2447,7 @@ export default function AdminPage() {
               {siteSettings.map((setting, idx) => (
               <div key={setting.key} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                 <label className="block text-sm font-medium text-gray-300">
-                  {setting.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  {setting.key.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                 </label>
                 <input
                   type="text"

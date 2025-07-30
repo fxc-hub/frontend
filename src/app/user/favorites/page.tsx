@@ -17,7 +17,7 @@ export default function FavoritesPage() {
   const { user } = useAuth();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'indicators' | 'alerts' | 'scanners'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'indicator' | 'alert' | 'scanner'>('all');
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
@@ -174,13 +174,13 @@ export default function FavoritesPage() {
           <div className="flex space-x-1 bg-gray-900 p-1 rounded-lg">
             {[
               { key: 'all', label: 'All', count: favorites.length },
-              { key: 'indicators', label: 'Indicators', count: favorites.filter(f => f.type === 'indicator').length },
-              { key: 'alerts', label: 'Alerts', count: favorites.filter(f => f.type === 'alert').length },
-              { key: 'scanners', label: 'Scanners', count: favorites.filter(f => f.type === 'scanner').length }
+              { key: 'indicator', label: 'Indicators', count: favorites.filter(f => f.type === 'indicator').length },
+              { key: 'alert', label: 'Alerts', count: favorites.filter(f => f.type === 'alert').length },
+              { key: 'scanner', label: 'Scanners', count: favorites.filter(f => f.type === 'scanner').length }
             ].map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
+                onClick={() => setActiveTab(tab.key as 'all' | 'indicator' | 'alert' | 'scanner')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   activeTab === tab.key
                                          ? 'bg-yellow-600 text-white'

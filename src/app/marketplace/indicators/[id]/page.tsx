@@ -57,7 +57,7 @@ interface Review {
   }
 }
 
-export default function IndicatorDetailPage({ params }: { params: { id: string } }) {
+export default function IndicatorDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const [indicator, setIndicator] = useState<Indicator | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
@@ -65,19 +65,32 @@ export default function IndicatorDetailPage({ params }: { params: { id: string }
   const [activeTab, setActiveTab] = useState('overview')
   const [newReview, setNewReview] = useState({ rating: 5, title: '', comment: '' })
   const [showReviewForm, setShowReviewForm] = useState(false)
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null)
 
   useEffect(() => {
-    fetchIndicatorDetails()
-    fetchReviews()
-  }, [params.id])
+    const resolveParams = async () => {
+      const resolved = await params
+      setResolvedParams(resolved)
+    }
+    resolveParams()
+  }, [params])
+
+  useEffect(() => {
+    if (resolvedParams) {
+      fetchIndicatorDetails()
+      fetchReviews()
+    }
+  }, [resolvedParams])
 
   const fetchIndicatorDetails = async () => {
+    if (!resolvedParams) return
+    
     try {
       const token = localStorage.getItem('token')
       const headers: HeadersInit = { 'Content-Type': 'application/json' }
       if (token) headers['Authorization'] = `Bearer ${token}`
 
-      const response = await fetch(`/api/marketplace/indicators?id=${params.id}`, { headers })
+      const response = await fetch(`/api/marketplace/indicators?id=${resolvedParams.id}`, { headers })
       const data = await response.json()
       
       if (response.ok && data.indicators.length > 0) {
@@ -91,8 +104,10 @@ export default function IndicatorDetailPage({ params }: { params: { id: string }
   }
 
   const fetchReviews = async () => {
+    if (!resolvedParams) return
+    
     try {
-      const response = await fetch(`/api/marketplace/indicators/${params.id}/reviews`)
+      const response = await fetch(`/api/marketplace/indicators/${resolvedParams.id}/reviews`)
       const data = await response.json()
       if (response.ok) {
         setReviews(data.reviews)
@@ -103,6 +118,8 @@ export default function IndicatorDetailPage({ params }: { params: { id: string }
   }
 
   const toggleFavorite = async () => {
+    if (!resolvedParams) return
+    
     const token = localStorage.getItem('token')
     if (!token) {
       router.push('/')
@@ -110,7 +127,7 @@ export default function IndicatorDetailPage({ params }: { params: { id: string }
     }
 
     try {
-      const response = await fetch(`/api/marketplace/indicators/${params.id}/favorite`, {
+      const response = await fetch(`/api/marketplace/indicators/${resolvedParams.id}/favorite`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
       })
@@ -126,11 +143,13 @@ export default function IndicatorDetailPage({ params }: { params: { id: string }
 
   const submitReview = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!resolvedParams) return
+    
     const token = localStorage.getItem('token')
     if (!token) return
 
     try {
-      const response = await fetch(`/api/marketplace/indicators/${params.id}/reviews`, {
+      const response = await fetch(`/api/marketplace/indicators/${resolvedParams.id}/reviews`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(newReview)

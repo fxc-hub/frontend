@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function EmailVerificationPage() {
+function EmailVerificationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const status = searchParams.get('status');
@@ -119,5 +120,17 @@ export default function EmailVerificationPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function EmailVerificationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    }>
+      <EmailVerificationContent />
+    </Suspense>
   );
 } 

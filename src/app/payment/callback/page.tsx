@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircleIcon, XCircleIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { api } from '@/lib/api'
 
-export default function PaymentCallbackPage() {
+function PaymentCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<'loading' | 'success' | 'failed' | 'pending'>('loading')
@@ -169,5 +169,25 @@ export default function PaymentCallbackPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PaymentCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center py-8 px-4">
+        <div className="max-w-md w-full">
+          <div className="bg-blue-500/10 border border-blue-500/50 rounded-xl p-8 text-center">
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin" />
+            </div>
+            <h1 className="text-2xl font-bold mb-4 text-blue-400">Loading...</h1>
+            <p className="text-gray-300">Verifying payment...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <PaymentCallbackContent />
+    </Suspense>
   )
 } 

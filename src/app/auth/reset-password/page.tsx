@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { api } from "../../../lib/api";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [token, setToken] = useState("");
@@ -160,5 +160,23 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
+        <div className="bg-gray-900 rounded-2xl p-10 w-full max-w-md text-center">
+          <div className="bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+            <span className="text-2xl font-bold">FX</span>
+          </div>
+          <h1 className="text-2xl font-bold mb-2">Loading...</h1>
+          <p className="text-gray-400">Please wait while we load the reset password form...</p>
+        </div>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 } 

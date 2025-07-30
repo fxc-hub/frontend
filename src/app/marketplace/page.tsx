@@ -85,7 +85,7 @@ export default function MarketplacePage() {
     firstName?: string
     lastName?: string
     email?: string
-  } | null>(null)
+  } | undefined>(undefined)
   const [filters, setFilters] = useState({
     category: 'all',
     tier: 'all',
