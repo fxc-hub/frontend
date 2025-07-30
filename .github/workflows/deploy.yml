@@ -107,6 +107,22 @@ jobs:
         script: |
           echo "Starting frontend deployment to main domain..."
           
+          # Check and setup Node.js version
+          echo "Checking Node.js version..."
+          if ! command -v node &> /dev/null; then
+            echo "Node.js not found, installing Node.js 18..."
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+          else
+            NODE_VERSION=$(node --version)
+            echo "Current Node.js version: $NODE_VERSION"
+            if [[ ! "$NODE_VERSION" =~ ^v18 ]]; then
+              echo "Updating to Node.js 18..."
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
+          fi
+          
           # Navigate to main domain directory
           cd /home/fxc-hub.com/public_html
           
@@ -150,13 +166,21 @@ jobs:
           fi
           echo "✅ package.json found"
           
-          # Install dependencies
-          echo "Installing dependencies..."
+          # Verify .next directory exists (pre-built application)
+          if [ ! -d ".next" ]; then
+            echo "❌ .next directory not found - build artifacts missing"
+            echo "📋 Directory contents:"
+            ls -la
+            exit 1
+          fi
+          echo "✅ .next directory found (pre-built application)"
+          
+          # Install production dependencies only
+          echo "Installing production dependencies..."
           npm ci --production
           
-          # Build the application
-          echo "Building application..."
-          npm run build -- --no-lint
+          # The application is already built in GitHub Actions, no need to rebuild
+          echo "✅ Application already built in GitHub Actions"
           
           # Start PM2 process on port 3001
           echo "Starting PM2 frontend process..."
