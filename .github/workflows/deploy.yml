@@ -94,7 +94,7 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: 22
         source: "."
-        target: "/home/fxc-hub.com/public_html"
+        target: "/tmp/frontend-deploy"
         strip_components: 0
         
     - name: Deploy to VPS
@@ -129,13 +129,23 @@ jobs:
           echo "Clearing current content..."
           find . -maxdepth 1 ! -name '.' ! -name 'backup-*' -exec rm -rf {} +
           
-          # Files are copied by the scp-action
-          echo "Files copied from GitHub repository"
+          # Copy files from temporary location
+          echo "Copying files from temporary location..."
+          if [ -d "/tmp/frontend-deploy" ]; then
+            cp -r /tmp/frontend-deploy/* .
+            cp -r /tmp/frontend-deploy/.* . 2>/dev/null || true
+            echo "✅ Files copied successfully"
+          else
+            echo "❌ Temporary directory not found - deployment failed"
+            exit 1
+          fi
           
           # Verify files are present
           echo "Verifying files..."
           if [ ! -f "package.json" ]; then
             echo "❌ package.json not found - deployment failed"
+            echo "📋 Directory contents:"
+            ls -la
             exit 1
           fi
           echo "✅ package.json found"
@@ -166,5 +176,9 @@ jobs:
             echo "📋 PM2 Logs:"
             pm2 logs frontend --lines 10
           fi
+          
+          # Clean up temporary directory
+          echo "Cleaning up temporary files..."
+          rm -rf /tmp/frontend-deploy
           
           echo "Frontend deployment to main domain completed successfully!"
