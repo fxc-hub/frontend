@@ -124,7 +124,7 @@ export default function EducationHubPage() {
             </div>
             <h1 className="text-4xl font-bold text-white mb-2">Education Hub</h1>
             <p className="text-lg text-gray-300 mb-4 text-center max-w-2xl">
-              Watch curated Forex trading tutorials and educational videos. Click any video below to start learning!
+              Watch curated Forex trading tutorials and educational videos. Click any video below to start learning today!
             </p>
           </div>
 
