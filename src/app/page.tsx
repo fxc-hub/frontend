@@ -14,7 +14,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const { login: loginUser } = useAuth(); // Use AuthContext
+  const auth = useAuth(); // Use AuthContext
+  const loginUser = auth?.login;
   const [homepageImages, setHomepageImages] = useState([
     '/images/rsz_1751870612148.jpg',
     '/images/rsz_holiday.jpg',
@@ -26,14 +27,19 @@ export default function LoginPage() {
     async function fetchSettings() {
       try {
         const res = await fetch('/api/admin/site-settings');
-        if (!res.ok) return;
+        if (!res.ok) {
+          console.log('Site settings API not available, using default images');
+          return;
+        }
         const settings = await res.json();
         const images = [1,2,3,4].map(i => {
           const found = settings.find((s:any) => s.key === `homepage_image_${i}`);
           return found && found.value ? found.value : homepageImages[i-1];
         });
         setHomepageImages(images);
-      } catch {}
+      } catch (error) {
+        console.log('Could not fetch site settings, using default images');
+      }
     }
     fetchSettings();
     // eslint-disable-next-line
@@ -44,6 +50,11 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
     console.log('Main Page Login: Starting login process');
+    if (!loginUser) {
+      setError("Authentication service not available");
+      setIsLoading(false);
+      return;
+    }
     try {
       await loginUser(login, password);
       console.log('Main Page Login: Login successful, waiting for context update');
@@ -90,6 +101,18 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  // Show loading state while auth context initializes
+  if (!auth?.isInitialized) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

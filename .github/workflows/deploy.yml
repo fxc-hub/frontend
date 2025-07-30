@@ -53,7 +53,7 @@ jobs:
         
     - name: Install dependencies
       run: npm ci
-      
+        
     - name: Build application
       run: npm run build -- --no-lint
       
@@ -82,10 +82,9 @@ jobs:
         
     - name: Install dependencies
       run: npm ci
-      
+        
     - name: Build application
       run: npm run build -- --no-lint
-      
 
         
     - name: Deploy to VPS
@@ -96,31 +95,48 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: 22
         script: |
-          echo "Starting frontend deployment..."
+          echo "Starting frontend deployment to main domain..."
           
-          # Navigate to frontend directory
-          cd /home/${{ secrets.VPS_USERNAME }}/fxchubs/frontend
+          # Navigate to main domain directory
+          cd /home/fxc-hub.com/public_html
           
-          # Pull latest changes
-          git pull origin main
+          # Backup current content
+          if [ -d "backup-$(date +%Y%m%d)" ]; then
+            echo "Backup directory already exists, skipping backup"
+          else
+            echo "Creating backup of current content..."
+            cp -r . backup-$(date +%Y%m%d)
+          fi
+          
+          # Stop current PM2 process if running
+          if pm2 list | grep -q "frontend"; then
+            echo "Stopping existing PM2 frontend process..."
+            pm2 stop frontend
+            pm2 delete frontend
+          fi
+          
+          # Remove current content (except backup)
+          echo "Clearing current content..."
+          find . -maxdepth 1 ! -name '.' ! -name 'backup-*' -exec rm -rf {} +
+          
+          # Copy frontend files from stage directory
+          echo "Copying frontend files..."
+          cp -r /home/fxc-hub.com/public_html/stage/* .
           
           # Install dependencies
+          echo "Installing dependencies..."
           npm ci --production
           
           # Build the application
+          echo "Building application..."
           npm run build -- --no-lint
           
-          # Restart PM2 process
-          if pm2 list | grep -q "frontend"; then
-            echo "Restarting existing PM2 frontend process..."
-            pm2 restart frontend
-          else
-            echo "Starting new PM2 frontend process..."
-            pm2 start npm --name "frontend" -- start
-            pm2 save
-          fi
+          # Start PM2 process on port 3001
+          echo "Starting PM2 frontend process..."
+          PORT=3001 pm2 start npm --name "frontend" -- start
+          pm2 save
           
           # Show PM2 status
           pm2 list
           
-          echo "Frontend deployment completed successfully!"
+          echo "Frontend deployment to main domain completed successfully!"
