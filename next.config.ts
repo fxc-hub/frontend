@@ -16,14 +16,30 @@ const nextConfig: NextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  // Ensure proper static export for production
+  output: 'standalone',
+  // Disable image optimization if not needed
+  images: {
+    unoptimized: true,
+  },
   async rewrites() {
+    // Use environment variable for API URL, fallback to localhost for development
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
+                   (process.env.NODE_ENV === 'production' 
+                     ? 'http://localhost:8000' 
+                     : 'http://localhost:8000');
+    
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8000/api/:path*',
+        destination: `${apiUrl}/api/:path*`,
       },
     ];
   },
+  // Add trailing slash for better server compatibility
+  trailingSlash: false,
+  // Ensure proper base path if needed
+  basePath: '',
 };
 
 export default nextConfig;
