@@ -105,7 +105,11 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: 22
         script: |
-          echo "Starting frontend deployment to main domain..."
+          echo "🚀 Starting frontend deployment with new scripts..."
+          
+          # Get server IP for API configuration
+          SERVER_IP=$(hostname -I | awk '{print $1}')
+          echo "Server IP: $SERVER_IP"
           
           # Check and setup Node.js version
           echo "Checking Node.js version..."
@@ -175,6 +179,16 @@ jobs:
           fi
           echo "✅ .next directory found (pre-built application)"
           
+          # Create environment file with correct API URL
+          echo "Creating environment configuration..."
+          cat > .env.local << EOF
+          NEXT_PUBLIC_APP_NAME=FXCHUB
+          NEXT_PUBLIC_API_URL=http://$SERVER_IP:8000
+          NODE_ENV=production
+          PORT=3001
+          EOF
+          echo "✅ Environment file created with API URL: http://$SERVER_IP:8000"
+          
           # Install production dependencies only
           echo "Installing production dependencies..."
           npm ci --production
@@ -189,6 +203,63 @@ jobs:
           
           # Show PM2 status
           pm2 list
+          
+          # Create LiteSpeed configuration for proxy
+          echo "Creating LiteSpeed configuration..."
+          cat > /usr/local/lsws/conf/vhosts/fxchubs-frontend.conf << EOF
+          docRoot                   \$VH_ROOT/public_html
+          enableGzip               1
+          enableBr                 1
+          
+          index  {
+            useServer               0
+            indexFiles              index.html, index.php
+          }
+          
+          rewrite  {
+            enable                  1
+            rules                   <<<END_rules
+          RewriteEngine On
+          RewriteCond %{REQUEST_FILENAME} !-f
+          RewriteCond %{REQUEST_FILENAME} !-d
+          RewriteRule ^(.*)$ http://localhost:3001/\$1 [P,L]
+          END_rules
+          }
+          
+          accesslog \$VH_ROOT/logs/access.log {
+            useServer               0
+            logFormat               "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\""
+            logHeaders              5
+            rollingSize             10M
+            keepDays                30
+            compressArchive         1
+          }
+          
+          errorlog \$VH_ROOT/logs/error.log {
+            useServer               0
+            logLevel                ERROR
+            rollingSize             10M
+            keepDays                30
+            compressArchive         1
+          }
+          
+          context / {
+            type                    proxy
+            handler                 http://localhost:3001
+            addDefaultCharset       off
+          }
+          
+          context /api {
+            type                    proxy
+            handler                 http://$SERVER_IP:8000/api
+            addDefaultCharset       off
+          }
+          EOF
+          echo "✅ LiteSpeed configuration created"
+          
+          # Restart LiteSpeed to apply changes
+          echo "Restarting LiteSpeed server..."
+          systemctl restart lsws
           
           # Test the deployment
           echo "Testing deployment..."
@@ -205,4 +276,6 @@ jobs:
           echo "Cleaning up temporary files..."
           rm -rf /tmp/frontend-deploy
           
-          echo "Frontend deployment to main domain completed successfully!"
+          echo "🎉 Frontend deployment completed successfully!"
+          echo "🌐 Frontend accessible at: http://$SERVER_IP"
+          echo "🔗 API accessible at: http://$SERVER_IP:8000"
